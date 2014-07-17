@@ -1,0 +1,15 @@
+lint.xml
+proguard-project.txt
+project.properties
+.project
+.classpath
+/.settings
+/libs
+/bin
+/assets
+/gen
+/res/drawable-hdpi
+/res/drawable-mdpi
+/res/drawable-xhdpi
+/res/drawable-xxhdpi
+/res/drawable-ldpi
