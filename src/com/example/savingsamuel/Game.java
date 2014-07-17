@@ -21,11 +21,11 @@ public class Game extends Activity {
     protected void onResume() {
     	super.onResume();
     	SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-    	boolean blue = sharedPref.getBoolean("pref_test", false);
-    	if (blue) {
-    		mGLView.setClearBlue();
+    	boolean white = sharedPref.getBoolean("pref_test", false);
+    	if (white) {
+    		mGLView.setClearWhite();
     	} else {
-    		mGLView.setClearRed();
+    		mGLView.setClearBlack();
     	}
     }
 }

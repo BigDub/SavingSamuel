@@ -5,6 +5,6 @@
     <string name="play_button">Play</string>
     <string name="settings">Settings</string>
     
-    <string name="pref_test_title">Blue</string>
-	<string name="pref_test_summary">Use a blue background instead of red.</string>
+    <string name="pref_test_title">White</string>
+	<string name="pref_test_summary">Use a white background instead of black.</string>
 </resources>
