@@ -19,7 +19,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	public void onSurfaceCreated(GL10 gl, EGLConfig config) {
 		GLES20.glClearColor(_r, _g, _b, 1.0f);
         Matrix.setLookAtM(mViewMatrix, 0, 
-        		0f, 0f, -3f, // Position
+        		0f, 0f, 3f, // Position
         		0f, 0f, 0f, // Target
         		0f, 1f, 0f // Up
         		);
@@ -39,7 +39,8 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
         float aspectRatio = (float) width / height;
         
-        Matrix.frustumM(mProjectionMatrix, 0, -aspectRatio, aspectRatio, -1, 1, 3, 7);
+        Matrix.frustumM(mProjectionMatrix, 0, -aspectRatio, aspectRatio, -1, 1, 1, 10);
+        //Matrix.perspectiveM(mProjectionMatrix, 0, 90, aspectRatio, 1, 11);
         Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
 	}
 

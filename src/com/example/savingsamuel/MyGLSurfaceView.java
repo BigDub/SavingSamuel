@@ -15,6 +15,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 		
 		renderer = new MyRenderer();
 		setRenderer(renderer);
+		ShaderProgram.init(context);
 	}
 	
 	public void setClearWhite() {

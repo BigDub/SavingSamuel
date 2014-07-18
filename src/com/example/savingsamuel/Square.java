@@ -6,24 +6,29 @@ import java.nio.FloatBuffer;
 import java.nio.ShortBuffer;
 
 import android.opengl.GLES20;
+import android.opengl.Matrix;
+import android.os.SystemClock;
 
 public class Square {
 	
 	private final String vertexShaderCode =
 		"uniform mat4 uMVPMatrix;" +
 	    "attribute vec4 vPosition;" +
+		"attribute vec4 vColor;" +
+	    "varying vec4 _vcolor;" +
 	    "void main() {" +
 	    "  gl_Position = uMVPMatrix * vPosition;" +
+	    "  _vcolor = vColor;" +
 	    "}";
 
 	private final String fragmentShaderCode =
 		"precision mediump float;" +
-	    "uniform vec4 vColor;" +
+	    "varying vec4 _vcolor;" +
 	    "void main() {" +
-	    "  gl_FragColor = vColor;" +
+	    "  gl_FragColor = _vcolor;" +
 	    "}";
 
-	private final FloatBuffer vertexBuffer;
+	private final FloatBuffer vertexBuffer, colorBuffer;
     private final ShortBuffer drawListBuffer;
     private final int mProgram;
     private int mPositionHandle;
@@ -37,10 +42,20 @@ public class Square {
             -0.5f, -0.5f, 0.0f,   // bottom left
              0.5f, -0.5f, 0.0f,   // bottom right
              0.5f,  0.5f, 0.0f }; // top right
+    
+    static float vertColors[] = {
+    	1f, 1f, 1f, 1f,
+    	1f, 0f, 0f, 1f,
+    	0f, 0f, 0f, 1f,
+    	0f, 0f, 1f, 1f
+    };
 
     private short drawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
+    private long uptime = SystemClock.uptimeMillis();
+    private float angle = 0;
     
     private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
+    private final int colorStride = 16;
 
     float color[] = { 0.2f, 0.709803922f, 0.898039216f, 1.0f };
 
@@ -63,13 +78,14 @@ public class Square {
         drawListBuffer.put(drawOrder);
         drawListBuffer.position(0);
         
-        int vertexShader = MyRenderer.loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
-        int fragmentShader = MyRenderer.loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
+        ByteBuffer cb = ByteBuffer.allocateDirect(
+        		vertColors.length * 4);
+        cb.order(ByteOrder.nativeOrder());
+        colorBuffer = cb.asFloatBuffer();
+        colorBuffer.put(vertColors);
+        colorBuffer.position(0);
 
-        mProgram = GLES20.glCreateProgram();             // create empty OpenGL ES Program
-        GLES20.glAttachShader(mProgram, vertexShader);   // add the vertex shader to program
-        GLES20.glAttachShader(mProgram, fragmentShader); // add the fragment shader to program
-        GLES20.glLinkProgram(mProgram);                  // creates OpenGL ES program executables
+        mProgram = ShaderProgram.VaryingColor();
     }
     
     public void draw(float[] mVPMatrix) {
@@ -88,20 +104,33 @@ public class Square {
                                      vertexStride, vertexBuffer);
 
         // get handle to fragment shader's vColor member
-        mColorHandle = GLES20.glGetUniformLocation(mProgram, "vColor");
+        mColorHandle = GLES20.glGetAttribLocation(mProgram, "vColor");
 
-        // Set color for drawing the triangle
-        GLES20.glUniform4fv(mColorHandle, 1, color, 0);
+        GLES20.glEnableVertexAttribArray(mColorHandle);
+
+        GLES20.glVertexAttribPointer(mColorHandle, 4,
+        		GLES20.GL_FLOAT, false,
+        		colorStride, colorBuffer);
 
         // get handle to shape's transformation matrix
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
         //MyRenderer.checkGlError("glGetUniformLocation");
         
         //TODO multiply model matrix by world matrix. Multiply result by mVPMatrix to get mMVPMatrix.
-        //float[] mMVPMatrix = mVPMatrix;
+        long nuptime = SystemClock.uptimeMillis();
+        float elapsed = (float) (nuptime - uptime) / 1000f;
+        angle += elapsed;
+        uptime = nuptime;
+        float[] mMVPMatrix = new float[16];
+        float[] mWorldMatrix = new float[16];
+        Matrix.setIdentityM(mWorldMatrix, 0);
+        Matrix.translateM(mWorldMatrix, 0, (float) Math.cos(angle), (float) Math.sin(angle), (float) Math.cos(angle/10f));
+        //Matrix.rotateM(mWorldMatrix, 0, angle * 10f, 0f, 0f, 1f);
+        Matrix.multiplyMM(mMVPMatrix, 0, mVPMatrix, 0, mWorldMatrix, 0);
+
         
         // Apply the projection and view transformation
-        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mVPMatrix, 0);
+        GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);
         //MyRenderer.checkGlError("glUniformMatrix4fv");
         
         // Draw the square
@@ -111,5 +140,6 @@ public class Square {
 
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
+        GLES20.glDisableVertexAttribArray(mColorHandle);
     }
 }

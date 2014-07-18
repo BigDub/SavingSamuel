@@ -44,6 +44,7 @@
         <activity
             android:name="com.example.savingsamuel.Game"
             android:label="@string/app_name"
+            android:screenOrientation="landscape"
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen"
             android:launchMode="singleInstance"
             android:parentActivityName="com.example.savingsamuel.Home" >
