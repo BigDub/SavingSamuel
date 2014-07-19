@@ -5,7 +5,7 @@ import android.opengl.GLES20;
 
 public class ShaderProgram {
 	private static Context _context;
-	private static ShaderProgram _uniformColor, _varyingColor;
+	private static ShaderProgram _uniformColor, _varyingColor, _textured;
 	
 	public static void init(Context context) {
 		_context = context;
@@ -15,6 +15,9 @@ public class ShaderProgram {
 		_varyingColor = new ShaderProgram(
 				_context.getString(R.string.vertexShaderAttributePC),
 				_context.getString(R.string.fragmentShaderVaryingC));
+		_textured = new ShaderProgram(
+				_context.getString(R.string.vertexShaderTextured),
+				_context.getString(R.string.fragmentShaderTextured));
 	}
 	private static int loadShader(int type, String shaderCode){
 
@@ -39,6 +42,12 @@ public class ShaderProgram {
 			_varyingColor.compileProgram();
 		}
 		return _varyingColor.hProgram;
+	}
+	public static int Textured() {
+		if(_textured.hProgram == -1) {
+			_textured.compileProgram();
+		}
+		return _textured.hProgram;
 	}
 	
 	private int hProgram = -1, hVertexShader = -1, hFragmentShader = -1;

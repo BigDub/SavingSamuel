@@ -6,6 +6,18 @@ import android.opengl.GLSurfaceView;
 public class MyGLSurfaceView extends GLSurfaceView {
 	
 	private MyRenderer renderer;
+	
+	/*@Override
+	public boolean onTouchEvent(MotionEvent e) {
+		float x = e.getX();
+		float y = e.getY();
+		
+		switch(e.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			break;
+		}
+		return true;
+	}*/
 
 	public MyGLSurfaceView(Context context) {
 		super(context);
@@ -16,6 +28,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 		renderer = new MyRenderer();
 		setRenderer(renderer);
 		ShaderProgram.init(context);
+		Texture.init(context);
 	}
 	
 	public void setClearWhite() {

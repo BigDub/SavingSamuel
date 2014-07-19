@@ -10,29 +10,13 @@ import android.opengl.Matrix;
 import android.os.SystemClock;
 
 public class Square {
-	
-	private final String vertexShaderCode =
-		"uniform mat4 uMVPMatrix;" +
-	    "attribute vec4 vPosition;" +
-		"attribute vec4 vColor;" +
-	    "varying vec4 _vcolor;" +
-	    "void main() {" +
-	    "  gl_Position = uMVPMatrix * vPosition;" +
-	    "  _vcolor = vColor;" +
-	    "}";
 
-	private final String fragmentShaderCode =
-		"precision mediump float;" +
-	    "varying vec4 _vcolor;" +
-	    "void main() {" +
-	    "  gl_FragColor = _vcolor;" +
-	    "}";
-
-	private final FloatBuffer vertexBuffer, colorBuffer;
+	private final FloatBuffer vertexBuffer, uvBuffer;
     private final ShortBuffer drawListBuffer;
     private final int mProgram;
     private int mPositionHandle;
-    private int mColorHandle;
+    private int mUVHandle;
+    private int mTextureHandle;
     private int mMVPMatrixHandle;
 
     // number of coordinates per vertex in this array
@@ -43,11 +27,11 @@ public class Square {
              0.5f, -0.5f, 0.0f,   // bottom right
              0.5f,  0.5f, 0.0f }; // top right
     
-    static float vertColors[] = {
-    	1f, 1f, 1f, 1f,
-    	1f, 0f, 0f, 1f,
-    	0f, 0f, 0f, 1f,
-    	0f, 0f, 1f, 1f
+    static float vertUVs[] = {
+    	0f, 0f,
+    	0f, 1f,
+    	1f, 1f,
+    	1f, 0f
     };
 
     private short drawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
@@ -55,9 +39,7 @@ public class Square {
     private float angle = 0;
     
     private final int vertexStride = COORDS_PER_VERTEX * 4; // 4 bytes per vertex
-    private final int colorStride = 16;
-
-    float color[] = { 0.2f, 0.709803922f, 0.898039216f, 1.0f };
+    private final int uvStride = 8;
 
     public Square() {
         // initialize vertex byte buffer for shape coordinates
@@ -78,14 +60,14 @@ public class Square {
         drawListBuffer.put(drawOrder);
         drawListBuffer.position(0);
         
-        ByteBuffer cb = ByteBuffer.allocateDirect(
-        		vertColors.length * 4);
-        cb.order(ByteOrder.nativeOrder());
-        colorBuffer = cb.asFloatBuffer();
-        colorBuffer.put(vertColors);
-        colorBuffer.position(0);
+        ByteBuffer uvb = ByteBuffer.allocateDirect(
+        		vertUVs.length * 4);
+        uvb.order(ByteOrder.nativeOrder());
+        uvBuffer = uvb.asFloatBuffer();
+        uvBuffer.put(vertUVs);
+        uvBuffer.position(0);
 
-        mProgram = ShaderProgram.VaryingColor();
+        mProgram = ShaderProgram.Textured();
     }
     
     public void draw(float[] mVPMatrix) {
@@ -104,17 +86,21 @@ public class Square {
                                      vertexStride, vertexBuffer);
 
         // get handle to fragment shader's vColor member
-        mColorHandle = GLES20.glGetAttribLocation(mProgram, "vColor");
+        mUVHandle = GLES20.glGetAttribLocation(mProgram, "vUV");
 
-        GLES20.glEnableVertexAttribArray(mColorHandle);
+        GLES20.glEnableVertexAttribArray(mUVHandle);
 
-        GLES20.glVertexAttribPointer(mColorHandle, 4,
+        GLES20.glVertexAttribPointer(mUVHandle, 2,
         		GLES20.GL_FLOAT, false,
-        		colorStride, colorBuffer);
+        		uvStride, uvBuffer);
 
         // get handle to shape's transformation matrix
         mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
-        //MyRenderer.checkGlError("glGetUniformLocation");
+        
+        mTextureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
+        GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, Texture.getTexture());
+        GLES20.glUniform1i(mTextureHandle, 0);
         
         //TODO multiply model matrix by world matrix. Multiply result by mVPMatrix to get mMVPMatrix.
         long nuptime = SystemClock.uptimeMillis();
@@ -140,6 +126,6 @@ public class Square {
 
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
-        GLES20.glDisableVertexAttribArray(mColorHandle);
+        GLES20.glDisableVertexAttribArray(mUVHandle);
     }
 }
