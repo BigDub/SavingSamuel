@@ -30,11 +30,4 @@ public class MyGLSurfaceView extends GLSurfaceView {
 		ShaderProgram.init(context);
 		Texture.init(context);
 	}
-	
-	public void setClearWhite() {
-		renderer.setClearColor(1.0f, 1.0f, 1.0f);
-	}
-	public void setClearBlack() {
-		renderer.setClearColor(0.0f, 0.0f, 0.0f);
-	}
 }
