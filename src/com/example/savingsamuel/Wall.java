@@ -1,8 +1,9 @@
 package com.example.savingsamuel;
 
 
-public class Wall {    
-    static float vertices[] = {
+public class Wall {
+	private static final float _top = 20f;
+    private static final float _vertices[] = {
 	    -20f,  20f, 0.0f,	// top left
 		0.96f, 0.78f, 0.45f, 1.0f,
 	    -20f, 0f, 0.0f,	// bottom left
@@ -13,15 +14,19 @@ public class Wall {
 	 	0.96f, 0.78f, 0.45f, 1.0f
 	 	};
 
-    private short drawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
+    private static final short _drawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
     
-    private Mesh mesh;
+    private static Mesh _mesh;
+    
+    public static float Top() {
+    	return _top;
+    }
 
-    public Wall() {
-        mesh = new ColoredMesh(vertices, drawOrder);
+    public static void Init() {
+        _mesh = new ColoredMesh(_vertices, _drawOrder);
     }
     
-    public void draw(float[] mVPMatrix) {
-        mesh.draw(mVPMatrix);
+    public static void draw() {
+        _mesh.draw(MyRenderer.mVPMatrix());
     }
 }
