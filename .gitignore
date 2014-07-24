@@ -13,3 +13,5 @@ project.properties
 /res/drawable-xhdpi
 /res/drawable-xxhdpi
 /res/drawable-ldpi
+/res/raw
+/res/drawable
