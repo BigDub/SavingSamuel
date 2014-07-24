@@ -7,7 +7,7 @@ public class ShaderProgram {
 	private static Context _context;
 	private static ShaderProgram _uniformColor, _varyingColor, _textured;
 	
-	public static void init(Context context) {
+	public static void Init(Context context) {
 		_context = context;
 		_uniformColor = new ShaderProgram(
 				_context.getString(R.string.vertexShaderAttributeP),

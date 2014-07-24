@@ -22,7 +22,7 @@ public class Wall {
     	return _top;
     }
 
-    public static void Init() {
+    public static void Load() {
         _mesh = new ColoredMesh(_vertices, _drawOrder);
     }
     

@@ -1,7 +1,7 @@
 package com.example.savingsamuel;
 
 
-public class Samuel {    
+public class Samuel {
 	private static final float
 		_height = 2f,
 		_width = 2f,
@@ -36,7 +36,7 @@ public class Samuel {
     public static float Bottom() {
     	return _bottom;
     }
-    public static void Init() {
+    public static void Load() {
         _mesh = new TexturedMesh(_vertices, _drawOrder, "icon");
     }
     

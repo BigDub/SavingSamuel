@@ -1,23 +1,29 @@
 package com.example.savingsamuel;
 
+import android.annotation.SuppressLint;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
+import android.opengl.Matrix;
+import android.util.Log;
+import android.view.MotionEvent;
 
+@SuppressLint("ClickableViewAccessibility")
 public class MyGLSurfaceView extends GLSurfaceView {
 	
 	private MyRenderer renderer;
 	
-	/*@Override
+	@Override
 	public boolean onTouchEvent(MotionEvent e) {
 		float x = e.getX();
 		float y = e.getY();
 		
 		switch(e.getAction()) {
 		case MotionEvent.ACTION_DOWN:
+			Projectile.Knock(x, y, 30);
 			break;
 		}
 		return true;
-	}*/
+	}
 
 	public MyGLSurfaceView(Context context) {
 		super(context);
@@ -27,7 +33,5 @@ public class MyGLSurfaceView extends GLSurfaceView {
 		
 		renderer = new MyRenderer();
 		setRenderer(renderer);
-		ShaderProgram.init(context);
-		Texture.init(context);
 	}
 }

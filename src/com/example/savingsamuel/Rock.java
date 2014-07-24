@@ -2,7 +2,7 @@ package com.example.savingsamuel;
 
 
 public class Rock extends Projectile{
-	
+	private short _variation;
 	private static float _vertices[] = {
 	    -0.5f,  0.5f, 0.0f,	// top left
 		0f, 0f,
@@ -16,10 +16,14 @@ public class Rock extends Projectile{
 
     private static short _drawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
     
-    private static Mesh _mesh = new TexturedMesh(_vertices, _drawOrder, "rock");
+    private static Mesh[] _meshes = new Mesh[] {
+    	new TexturedMesh(_vertices, _drawOrder, "rock0"),
+    	new TexturedMesh(_vertices, _drawOrder, "rock1")
+    };
     
 	private Rock() {
 		super();
+		_variation = (short)(Math.random() * 1.99f);
 		Projectile._projectiles.add(this);
 	}
 	
@@ -30,6 +34,6 @@ public class Rock extends Projectile{
 
 	@Override
 	protected Mesh mesh() {
-		return _mesh;
+		return _meshes[_variation];
 	}
 }

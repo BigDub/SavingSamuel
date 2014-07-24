@@ -13,7 +13,7 @@ public class Texture {
 	private static Context _context;
 	private static Map<String, Integer> _textureMap;
 	
-	public static void init(Context context) {
+	public static void Init(Context context) {
 		_context = context;
 		_textureMap = new HashMap<String, Integer>();
 	}
