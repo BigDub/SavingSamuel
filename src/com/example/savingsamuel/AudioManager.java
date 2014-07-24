@@ -6,6 +6,11 @@ import android.media.MediaPlayer;
 public class AudioManager {
 	private static Context _context;
 	private static AudioManager _instance;
+	private static boolean _mute = false;
+	
+	public static void updateMute(boolean mute) {
+		_mute = mute;
+	}
 
 	public static void Init(Context context) {
 		_context = context;
@@ -26,13 +31,19 @@ public class AudioManager {
 	}
 	
 	public static void playWilhelm() {
+		if(_mute)
+			return;
 		_instance._mediaPlayers[0].start();
 	}
 	public static void playSlap() {
+		if(_mute)
+			return;
 		int n = (int)(Math.random() * 2.99f);
 		_instance.playSlap(n);
 	}
 	public static void playImpact() {
+		if(_mute)
+			return;
 		int n = (int)(Math.random() * 2.99f);
 		_instance.playImpact(n);
 	}

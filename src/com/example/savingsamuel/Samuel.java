@@ -6,9 +6,7 @@ public class Samuel {
 		_height = 2f,
 		_width = 2f,
 		_left = -0.5f * _width,
-		_right = 0.5f * _width,
-		_bottom = Wall.Top(),
-		_top = _bottom + _height;
+		_bottom = Wall.Top();
     private static final float _vertices[] = {
 	    -1f,  22f, 0.0f,	// top left
 		0f, 0f,
@@ -27,11 +25,11 @@ public class Samuel {
     public static float Left() {
     	return _left;
     }
-    public static float Right() {
-    	return _right;
+    public static float Width() {
+    	return _width;
     }
-    public static float Top() {
-    	return _top;
+    public static float Height() {
+    	return _height;
     }
     public static float Bottom() {
     	return _bottom;

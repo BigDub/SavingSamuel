@@ -16,24 +16,33 @@ public class Rock extends Projectile{
 
     private static short _drawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
     
-    private static Mesh[] _meshes = new Mesh[] {
-    	new TexturedMesh(_vertices, _drawOrder, "rock0"),
-    	new TexturedMesh(_vertices, _drawOrder, "rock1")
-    };
+    private static Mesh[] _meshes;
+    
+    public static void Load() {
+    	_meshes = new Mesh[] {
+    			new TexturedMesh(_vertices, _drawOrder, "rock0"),
+    			new TexturedMesh(_vertices, _drawOrder, "rock1")
+    	};
+    }
     
 	private Rock() {
 		super();
-		_variation = (short)(Math.random() * 1.99f);
+		_variation = (short)(Math.random() * 2f);
 		Projectile._projectiles.add(this);
 	}
 	
-	public static void Launch(float r, float s, float x, float y, float z, float vx, float vy, float vz) {
+	public static void Launch(float rotation, float spin, Vector3 scale, Vector3 position, Vector3 velocity) {
 		Rock rock = new Rock();
-		rock._launch(r, s, x, y, z, vx, vy, vz);
+		rock._launch(rotation, spin, scale, position, velocity);
 	}
 
 	@Override
 	protected Mesh mesh() {
 		return _meshes[_variation];
+	}
+	
+	@Override
+	protected float collisionRadius() {
+		return _scale.x * 0.375f;
 	}
 }

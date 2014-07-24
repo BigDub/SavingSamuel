@@ -1,8 +1,10 @@
 package com.example.savingsamuel;
 
 import android.app.Activity;
+import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 
 public class Game extends Activity {
 	
@@ -22,7 +24,7 @@ public class Game extends Activity {
     @Override
     protected void onResume() {
     	super.onResume();
-    	//SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
-    	//boolean white = sharedPref.getBoolean("pref_test", false);
+    	SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
+    	GameStateManager.updatePreferences(sharedPref);
     }
 }

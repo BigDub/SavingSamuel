@@ -11,9 +11,9 @@ public class ProjectileComparator implements Comparator<Projectile> {
 
 	@Override
 	public int compare(Projectile arg0, Projectile arg1) {
-		if(arg0._z < arg1._z)
+		if(arg0._position.z < arg1._position.z)
 			return -1;
-		if(arg0._z == arg1._z)
+		if(arg0._position.z == arg1._position.z)
 			return 0;
 		return 1;
 	}

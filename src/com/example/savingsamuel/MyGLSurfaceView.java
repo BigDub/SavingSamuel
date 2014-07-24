@@ -3,8 +3,6 @@ package com.example.savingsamuel;
 import android.annotation.SuppressLint;
 import android.content.Context;
 import android.opengl.GLSurfaceView;
-import android.opengl.Matrix;
-import android.util.Log;
 import android.view.MotionEvent;
 
 @SuppressLint("ClickableViewAccessibility")

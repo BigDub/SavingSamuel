@@ -1,10 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-
     <string name="app_name">Saving Samuel</string>
     <string name="play_button">Play</string>
     <string name="settings">Settings</string>
     
-    <string name="pref_test_title">White</string>
-	<string name="pref_test_summary">Use a white background instead of black.</string>
+    <string name="pref_mute_title">Mute</string>
+	<string name="pref_mute_summary">Disables game sounds.</string>
 </resources>

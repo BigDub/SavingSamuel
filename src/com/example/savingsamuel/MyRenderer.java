@@ -32,12 +32,15 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         Matrix.setLookAtM(_mViewMatrix, 0, 
-        		0f, 17f, 10f, // Position
+        		GameStateManager.CameraPosition().x,
+        		GameStateManager.CameraPosition().y,
+        		GameStateManager.CameraPosition().z,
         		0f, 17f, 0f, // Target
         		0f, 1f, 0f // Up
         		);
         Wall.Load();
         Samuel.Load();
+        Rock.Load();
 	}
 	
 	@Override
