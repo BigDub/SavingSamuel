@@ -31,11 +31,24 @@ public class GameStateManager {
 	private long _uptime;
 	private float timer, distractionTimer;
 	
-	private static final Vector3 _cameraPosition = new Vector3(0, 17, 10);
+	private static final Vector3 _cameraPosition = new Vector3(0, Wall.Top(), Wall.Top() / 2);
 	public static Vector3 CameraPosition() { return _cameraPosition; }
 	
-	private void launchRock(Vector3 position, Vector3 target, float flightTime) {
+	private Vector3 launchOrigin() {
+		float x;
+		if(Math.random() < 0.5f) {
+			x = (float)Math.random() * 17f - 20f;
+		} else {
+			x = (float)Math.random() * 17f + 3f;
+		}
+		return new Vector3(x,
+    			0,
+    			(float)Math.random() * 9f + 1.0f);
+	}
+	private void launchRock(Vector3 target) {
+		Vector3 position = launchOrigin();
 		Vector3 delta = Vector3.Subtract(target, position);
+		float flightTime = (float)Math.random() * 0.2f + 2.8f;
     	Rock.Launch(
     			(float)Math.random() * 360f,
     			(float)Math.random() * 720f - 360f,
@@ -60,30 +73,20 @@ public class GameStateManager {
 	        distractionTimer += elapsed;
 	        if(distractionTimer >= 3.8f) {
 	        	distractionTimer = 0;
-	        	Vector3 position = new Vector3(
-	        			(float)Math.random() * 30f - 15f,
-	        			0,
-	        			(float)Math.random() * 4.5f + 0.5f);
-	        	launchRock(position,
-	        			new Vector3(
-	        					Samuel.Left() + (float)Math.random() * 8 * Samuel.Width() - 4 * Samuel.Width(),
-	        					Samuel.Bottom() - ((float)Math.random() * 2 + 2) * Samuel.Height(),
-	        					0),
-	        			(float)Math.random() * 0.5f + 1.5f
+	        	launchRock(new Vector3(
+	        					Samuel.Left() + (float)Math.random() * 6 * Samuel.Width() - 3 * Samuel.Width(),
+	        					Samuel.Bottom() - ((float)Math.random() + 1) * Samuel.Height(),
+	        					0)
+	        			//(float)Math.random() * 0.5f + 1.5f
 	        			); 
 	        }
 	        if(timer >= 1) {
 	        	timer = 0;
-	        	Vector3 position = new Vector3(
-	        			(float)Math.random() * 30f - 15f,
-	        			0,
-	        			(float)Math.random() * 4.5f + 0.5f);
-	        	launchRock(position,
-	        			new Vector3(
+	        	launchRock(new Vector3(
 	        					Samuel.Left() + (float)Math.random() * Samuel.Width(),
 	        					Samuel.Bottom() + (float)Math.random() * Samuel.Height(),
-	        					0),
-	        			(float)Math.random() * 0.5f + 2.5f
+	        					0)
+	        			//(float)Math.random() * 0.5f + 2.5f
 	        			);     	
 
 	        }

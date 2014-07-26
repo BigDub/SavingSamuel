@@ -8,13 +8,13 @@ public class Samuel {
 		_left = -0.5f * _width,
 		_bottom = Wall.Top();
     private static final float _vertices[] = {
-	    -1f,  22f, 0.0f,	// top left
+	    _left,  _bottom + _height, 0.0f,	// top left
 		0f, 0f,
-	    -1f, 20f, 0.0f,	// bottom left
+	    _left, _bottom, 0.0f,	// bottom left
 	    0f, 1f,
-	    1f, 20f, 0.0f, 	// bottom right
+	    _left + _width, _bottom, 0.0f, 	// bottom right
 	    1f, 1f,
-	 	1f,  22f, 0.0f,	// top right
+	 	_left + _width,  _bottom + _height, 0.0f,	// top right
 	 	1f, 0f
 	 	};
 
@@ -39,6 +39,6 @@ public class Samuel {
     }
     
     public static void draw() {
-        _mesh.draw(MyRenderer.mVPMatrix());
+        _mesh.draw(MyRenderer.mVPMatrix(), ShaderProgram.Textured());
     }
 }

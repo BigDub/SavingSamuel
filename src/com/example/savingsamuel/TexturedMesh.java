@@ -30,8 +30,8 @@ public class TexturedMesh extends Mesh {
 	}
 
 	@Override
-	public void draw(float[] mMVPMatrix) {
-		int mProgram = ShaderProgram.Textured();
+	public void draw(float[] mMVPMatrix, int mProgram) {
+		//int mProgram = ShaderProgram.Textured();
         // Add program to OpenGL ES environment
         GLES20.glUseProgram(mProgram);
 

@@ -8,35 +8,47 @@ import android.opengl.Matrix;
 
 public abstract class Projectile {
 	protected static Vector<Projectile> _projectiles, _preList, _postList;
+	private static int _pendingKnock = 0;
+	private static float _knockX, _knockY, _knockRadius;
 	public static void Init() {
 		_projectiles = new Vector<Projectile>();
 		_preList = new Vector<Projectile>();
 		_postList = new Vector<Projectile>();
 	}
 	public static void Update(float elapsed) {
-		for(Projectile p : _projectiles)
-			if(p._active)
-				p._update(elapsed);
-	}
-	
-	public static void Knock(float x, float y, float radius) {
 		boolean hit = false;
+		// Prevents asynchronous iteration of the projectile list which can cause fatal errors.
+		if(_pendingKnock == 1)
+			_pendingKnock = 2;
 		for(Projectile p : _projectiles) {
-			if(!p._active || p._position.z < 0)
-				continue;
-			float dx = x - p._screenX;
-			float dy = y - p._screenY;
-			float diff = (float)Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-			if(diff <= radius) {
-				hit = true;
-				Vector3 push = Vector3.Subtract(p._position, GameStateManager.CameraPosition());
-				push.y = 0;
-				p._spin *= 0.75f;
-				p._velocity.Scale(0.9f).Add(push.Normalize().Scale(10));
+			if(p._active) {
+				if(_pendingKnock > 0) {
+					float dx = _knockX - p._screenX;
+					float dy = _knockY - p._screenY;
+					float diff = (float)Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
+					if(diff <= _knockRadius) {
+						hit = true;
+						Vector3 push = Vector3.Subtract(p._position, GameStateManager.CameraPosition());
+						//push.y = 0;
+						p._spin *= 0.75f;
+						p._velocity.Scale(0.9f).Add(push.Normalize().Scale(6));
+					}
+				}
+				p._update(elapsed);
 			}
 		}
 		if(hit)
 			AudioManager.playSlap();
+		_pendingKnock = 0;
+	}
+	
+	public static void Knock(float x, float y, float radius) {
+		if(_pendingKnock != 2) {
+			_pendingKnock = 1;
+			_knockX = x;
+			_knockY = y;
+			_knockRadius = radius;
+		}
 	}
 	
     protected abstract Mesh mesh();
@@ -125,6 +137,11 @@ public abstract class Projectile {
     		p._draw();
     	}
     }
+    public static void drawShadow() {
+    	for(Projectile p : _postList) {
+    		p._drawShadow();
+    	}
+    }
     public static void drawPost() {
     	for(Projectile p : _postList) {
     		p._draw();
@@ -141,6 +158,17 @@ public abstract class Projectile {
         Matrix.rotateM(mWorldMatrix, 0, _rotation, 0f, 0f, 1f);
         Matrix.scaleM(mWorldMatrix, 0, _scale.x, _scale.y, _scale.z);
         Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mWorldMatrix, 0);
-        mesh().draw(mMVPMatrix);
+        mesh().draw(mMVPMatrix, ShaderProgram.Textured());
+    }
+    
+    private void _drawShadow() {
+    	float[] mMVPMatrix = new float[16];
+        float[] mWorldMatrix = new float[16];
+        Matrix.setIdentityM(mWorldMatrix, 0);
+        Matrix.translateM(mWorldMatrix, 0, _position.x, _position.y - _position.z, 0.01f);
+        Matrix.rotateM(mWorldMatrix, 0, _rotation, 0f, 0f, 1f);
+        Matrix.scaleM(mWorldMatrix, 0, _scale.x, _scale.y, _scale.z);
+        Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mWorldMatrix, 0);
+        mesh().draw(mMVPMatrix, ShaderProgram.Shadow());
     }
 }

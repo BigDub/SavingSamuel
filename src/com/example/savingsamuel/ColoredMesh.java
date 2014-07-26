@@ -28,8 +28,8 @@ public class ColoredMesh extends Mesh {
 	}
 
 	@Override
-	public void draw(float[] mMVPMatrix) {
-		int mProgram = ShaderProgram.VaryingColor();
+	public void draw(float[] mMVPMatrix, int mProgram) {
+		//int mProgram = ShaderProgram.VaryingColor();
         // Add program to OpenGL ES environment
         GLES20.glUseProgram(mProgram);
 

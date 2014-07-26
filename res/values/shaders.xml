@@ -49,5 +49,14 @@
 	      gl_FragColor = texture2D(uTexture, _vUV);
 	    }
     </string>
+    <string name="fragmentShaderShadow">
+        precision mediump float;
+        uniform sampler2D uTexture;
+	    varying vec2 _vUV;
+	    void main() {
+	   	  vec4 tex = texture2D(uTexture, _vUV);
+	      gl_FragColor = vec4(0, 0, 0, 1) * tex.a * 0.5;
+	    }
+    </string>
     
 </resources>
