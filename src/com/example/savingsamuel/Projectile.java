@@ -119,7 +119,7 @@ public abstract class Projectile {
     	Vector<Projectile> removeList = new Vector<Projectile>(1);
     	for(Projectile p : _projectiles) {
     		if(p._active) {
-    			if(p._position.z < 0) {
+    			if(p._position.z <= 0) {
     				_preList.add(p);
     			} else {
     				_postList.add(p);
@@ -164,10 +164,11 @@ public abstract class Projectile {
     private void _drawShadow() {
     	float[] mMVPMatrix = new float[16];
         float[] mWorldMatrix = new float[16];
+        float offset = 1.4142135623f * _scale.y;
         Matrix.setIdentityM(mWorldMatrix, 0);
-        Matrix.translateM(mWorldMatrix, 0, _position.x, _position.y - _position.z, 0.01f);
+        Matrix.translateM(mWorldMatrix, 0, _position.x, _position.y - _position.z, 0f);
+        Matrix.scaleM(mWorldMatrix, 0, _scale.x, offset, _scale.z);
         Matrix.rotateM(mWorldMatrix, 0, _rotation, 0f, 0f, 1f);
-        Matrix.scaleM(mWorldMatrix, 0, _scale.x, _scale.y, _scale.z);
         Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mWorldMatrix, 0);
         mesh().draw(mMVPMatrix, ShaderProgram.Shadow());
     }

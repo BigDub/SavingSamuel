@@ -67,7 +67,9 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         GLES20.glStencilFunc(GLES20.GL_EQUAL, 1, 0xFF);
         GLES20.glStencilMask(0x00);
         
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
         Projectile.drawShadow();
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         
         GLES20.glDisable(GLES20.GL_STENCIL_TEST);
         
