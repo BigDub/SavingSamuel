@@ -39,6 +39,6 @@ public class Wall {
     }
     
     public static void draw() {
-        _mesh.draw(_mMVPMatrix, ShaderProgram.VaryingColor());
+        _mesh.draw(_mMVPMatrix, Shader.VaryingColor());
     }
 }

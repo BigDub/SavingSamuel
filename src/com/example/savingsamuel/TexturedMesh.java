@@ -8,13 +8,13 @@ import java.nio.ShortBuffer;
 import android.opengl.GLES20;
 
 public class TexturedMesh extends Mesh {
-	protected int iTexture;
+	protected Texture tTexture;
 	protected final FloatBuffer vertexBuffer;
 	protected final ShortBuffer indexBuffer;
 	
 	private static int BYTES_PER_VERTEX = 4 * (3 + 2);
 	
-	public TexturedMesh(float[] vertices, short[] indices, String texture) {
+	public TexturedMesh(float[] vertices, short[] indices, Texture texture) {
 		ByteBuffer vb = ByteBuffer.allocateDirect(4 * vertices.length);
 		vb.order(ByteOrder.nativeOrder());
 		vertexBuffer = vb.asFloatBuffer();
@@ -26,17 +26,17 @@ public class TexturedMesh extends Mesh {
 		indexBuffer.put(indices);
 		indexBuffer.position(0);
 		
-		iTexture = Texture.loadTexture(texture);
+		tTexture = texture;
 	}
 
 	@Override
-	public void draw(float[] mMVPMatrix, int mProgram) {
+	public void draw(float[] mMVPMatrix, Shader mProgram) {
 		//int mProgram = ShaderProgram.Textured();
         // Add program to OpenGL ES environment
-        GLES20.glUseProgram(mProgram);
+        GLES20.glUseProgram(mProgram.Program());
 
         // get handle to vertex shader's vPosition member
-        int mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
+        int mPositionHandle = mProgram.getVertexAttribute("vPosition");
 
         // Enable a handle to the triangle vertices
         GLES20.glEnableVertexAttribArray(mPositionHandle);
@@ -48,7 +48,7 @@ public class TexturedMesh extends Mesh {
                                      BYTES_PER_VERTEX, vertexBuffer);
 
         // get handle to fragment shader's vColor member
-        int mUVHandle = GLES20.glGetAttribLocation(mProgram, "vUV");
+        int mUVHandle = mProgram.getVertexAttribute("vUV");
 
         GLES20.glEnableVertexAttribArray(mUVHandle);
 
@@ -58,11 +58,11 @@ public class TexturedMesh extends Mesh {
         		BYTES_PER_VERTEX, vertexBuffer);
 
         // get handle to shape's transformation matrix
-        int mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
+        int mMVPMatrixHandle = mProgram.getUniform("uMVPMatrix");
         
-        int mTextureHandle = GLES20.glGetUniformLocation(mProgram, "uTexture");
+        int mTextureHandle = mProgram.getUniform("uTexture");
         GLES20.glActiveTexture(GLES20.GL_TEXTURE0);
-        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, iTexture);
+        GLES20.glBindTexture(GLES20.GL_TEXTURE_2D, tTexture.Handle());
         GLES20.glUniform1i(mTextureHandle, 0);
 
         // Apply the projection and view transformation

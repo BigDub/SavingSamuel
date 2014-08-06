@@ -1,5 +1,7 @@
 package com.example.savingsamuel;
 
+import java.io.IOException;
+
 import android.content.Context;
 import android.media.MediaPlayer;
 
@@ -33,25 +35,34 @@ public class AudioManager {
 	public static void playWilhelm() {
 		if(_mute)
 			return;
-		_instance._mediaPlayers[0].start();
+		_instance.playSound(0);
 	}
 	public static void playSlap() {
 		if(_mute)
 			return;
 		int n = (int)(Math.random() * 2.99f);
-		_instance.playSlap(n);
+		_instance.playSound(n + 1);
 	}
 	public static void playImpact() {
 		if(_mute)
 			return;
 		int n = (int)(Math.random() * 2.99f);
-		_instance.playImpact(n);
+		_instance.playSound(n + 4);
 	}
 	
-	private void playSlap(int n) {
-		_mediaPlayers[n + 1].start();
-	}
-	private void playImpact(int n) {
-		_mediaPlayers[n + 4].start();
+	private void playSound(int n) {
+		if(_mediaPlayers[n].isPlaying()) {
+			_mediaPlayers[n].stop();
+			try {
+				_mediaPlayers[n].prepare();
+			} catch (IllegalStateException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+		}
+		_mediaPlayers[n].start();
 	}
 }

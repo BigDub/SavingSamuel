@@ -19,9 +19,11 @@ public class Rock extends Projectile{
     private static Mesh[] _meshes;
     
     public static void Load() {
+    	Texture t0 = Texture.loadTexture("rock0"),
+    			t1 = Texture.loadTexture("rock1");
     	_meshes = new Mesh[] {
-    			new TexturedMesh(_vertices, _drawOrder, "rock0"),
-    			new TexturedMesh(_vertices, _drawOrder, "rock1")
+    			new TexturedMesh(_vertices, _drawOrder, t0),
+    			new TexturedMesh(_vertices, _drawOrder, t1)
     	};
     }
     

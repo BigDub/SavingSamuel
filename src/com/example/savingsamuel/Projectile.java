@@ -3,11 +3,14 @@ package com.example.savingsamuel;
 import java.util.Collections;
 import java.util.Vector;
 
+import android.opengl.GLES20;
 import android.opengl.Matrix;
 
 
 public abstract class Projectile {
 	protected static Vector<Projectile> _projectiles, _preList, _postList;
+	private static float _effectTimer = 0, _tint;
+	private boolean _effectOn;
 	private static int _pendingKnock = 0;
 	private static float _knockX, _knockY, _knockRadius;
 	public static void Init() {
@@ -32,6 +35,7 @@ public abstract class Projectile {
 						//push.y = 0;
 						p._spin *= 0.75f;
 						p._velocity.Scale(0.9f).Add(push.Normalize().Scale(6));
+						p._effectOn = p._onTarget();
 					}
 				}
 				p._update(elapsed);
@@ -40,6 +44,10 @@ public abstract class Projectile {
 		if(hit)
 			AudioManager.playSlap();
 		_pendingKnock = 0;
+        _effectTimer += elapsed;
+        
+        if(_effectTimer >= Math.PI * 2)
+        	_effectTimer -= Math.PI * 2;
 	}
 	
 	public static void Knock(float x, float y, float radius) {
@@ -64,6 +72,7 @@ public abstract class Projectile {
     
     public Projectile() {
     	_active = false;
+    	_effectOn = false;
     	_position = new Vector3();
     	_velocity = new Vector3();
     }
@@ -75,6 +84,9 @@ public abstract class Projectile {
     	_scale = scale;
     	_position = position;
     	_velocity = velocity;
+    	
+    	//dependent on other values
+    	_effectOn = _onTarget();
     }
     
     private void _update(float elapsed) {
@@ -91,6 +103,7 @@ public abstract class Projectile {
 	    		_position.z = colrad;
 	    		_velocity = Vector3.Bounce(_velocity, Vector3.UnitZ()).Scale(0.2f);
 	    		_spin /= -2f;
+	    		_effectOn = false;
     		} else if(_position.y - colrad <= wall) {
     			//Impact with top of the wall
     			Vector3 normal = new Vector3(
@@ -102,6 +115,7 @@ public abstract class Projectile {
 	    		_position = Vector3.Scale(normal, colrad).Add(new Vector3(_position.x, wall, 0));
 	    		_velocity = Vector3.Bounce(_velocity, Vector3.UnitZ()).Scale(0.2f);
 	    		_spin /= -2f;
+	    		_effectOn = _onTarget();
     		}
     	}
 		_position.Add(Vector3.Scale(_velocity, elapsed));
@@ -119,7 +133,7 @@ public abstract class Projectile {
     	Vector<Projectile> removeList = new Vector<Projectile>(1);
     	for(Projectile p : _projectiles) {
     		if(p._active) {
-    			if(p._position.z <= 0) {
+    			if(p._position.z < 0) {
     				_preList.add(p);
     			} else {
     				_postList.add(p);
@@ -132,6 +146,11 @@ public abstract class Projectile {
     		_projectiles.remove(p);
     	Collections.sort(_preList, ProjectileComparator.Instance());
     	Collections.sort(_postList, ProjectileComparator.Instance());
+    	
+        _tint = (float)(Math.cos(_effectTimer * Math.PI * 4) / 4.0d + 0.75d);
+        GLES20.glUniform4f(
+        		GLES20.glGetUniformLocation(Shader.TintedTexture().Program(), "uTint"),
+        		1f, _tint, _tint, 1f);
     	
     	for(Projectile p : _preList) {
     		p._draw();
@@ -150,6 +169,18 @@ public abstract class Projectile {
     	_postList.clear();
     }
     
+    private boolean _onTarget() {
+    	if(_position.z > 0 && _velocity.z >= 0)
+    		return false;
+    	float colRad = collisionRadius(),
+    			flightTime = _position.z / -_velocity.z,
+    			projectedX = _position.x + _velocity.x * flightTime,
+    			projectedY = _position.y + _velocity.y * flightTime + (-9.8f / 2f) * flightTime * flightTime;
+    	return (projectedX + colRad >= Samuel.Left() &&
+    			projectedX - colRad <= Samuel.Left() + Samuel.Width() &&
+    			projectedY + colRad >= Samuel.Bottom() &&
+    			projectedY - colRad <= Samuel.Bottom() + Samuel.Height());
+    }
     private void _draw() {
     	float[] mMVPMatrix = new float[16];
         float[] mWorldMatrix = new float[16];
@@ -158,7 +189,11 @@ public abstract class Projectile {
         Matrix.rotateM(mWorldMatrix, 0, _rotation, 0f, 0f, 1f);
         Matrix.scaleM(mWorldMatrix, 0, _scale.x, _scale.y, _scale.z);
         Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mWorldMatrix, 0);
-        mesh().draw(mMVPMatrix, ShaderProgram.Textured());
+
+        if(_effectOn)
+        	mesh().draw(mMVPMatrix, Shader.TintedTexture());
+        else
+        	mesh().draw(mMVPMatrix, Shader.Textured());
     }
     
     private void _drawShadow() {
@@ -170,6 +205,6 @@ public abstract class Projectile {
         Matrix.scaleM(mWorldMatrix, 0, _scale.x, offset, _scale.z);
         Matrix.rotateM(mWorldMatrix, 0, _rotation, 0f, 0f, 1f);
         Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mWorldMatrix, 0);
-        mesh().draw(mMVPMatrix, ShaderProgram.Shadow());
+        mesh().draw(mMVPMatrix, Shader.Shadow());
     }
 }

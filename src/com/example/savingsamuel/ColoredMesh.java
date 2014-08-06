@@ -28,13 +28,13 @@ public class ColoredMesh extends Mesh {
 	}
 
 	@Override
-	public void draw(float[] mMVPMatrix, int mProgram) {
+	public void draw(float[] mMVPMatrix, Shader mProgram) {
 		//int mProgram = ShaderProgram.VaryingColor();
         // Add program to OpenGL ES environment
-        GLES20.glUseProgram(mProgram);
+        GLES20.glUseProgram(mProgram.Program());
 
         // get handle to vertex shader's vPosition member
-        int mPositionHandle = GLES20.glGetAttribLocation(mProgram, "vPosition");
+        int mPositionHandle = mProgram.getVertexAttribute("vPosition");
 
         // Enable a handle to the triangle vertices
         GLES20.glEnableVertexAttribArray(mPositionHandle);
@@ -46,7 +46,7 @@ public class ColoredMesh extends Mesh {
                                      BYTES_PER_VERTEX, vertexBuffer);
 
         // get handle to fragment shader's vColor member
-        int mUVHandle = GLES20.glGetAttribLocation(mProgram, "vColor");
+        int mUVHandle = mProgram.getVertexAttribute("vColor");
 
         GLES20.glEnableVertexAttribArray(mUVHandle);
 
@@ -56,7 +56,7 @@ public class ColoredMesh extends Mesh {
         		BYTES_PER_VERTEX, vertexBuffer);
 
         // get handle to shape's transformation matrix
-        int mMVPMatrixHandle = GLES20.glGetUniformLocation(mProgram, "uMVPMatrix");
+        int mMVPMatrixHandle = mProgram.getUniform("uMVPMatrix");
 
         // Apply the projection and view transformation
         GLES20.glUniformMatrix4fv(mMVPMatrixHandle, 1, false, mMVPMatrix, 0);

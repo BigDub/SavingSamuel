@@ -24,7 +24,7 @@ public class GameStateManager {
 		_instance = new GameStateManager();
         Projectile.Init();
         AudioManager.Init(context);
-		ShaderProgram.Init(context);
+		Shader.Init(context);
 		Texture.Init(context);
 	}
 	
@@ -43,7 +43,7 @@ public class GameStateManager {
 		}
 		return new Vector3(x,
     			0,
-    			(float)Math.random() * 9f + 1.0f);
+    			(float)Math.random() * 4f + 1.0f);
 	}
 	private void launchRock(Vector3 target) {
 		Vector3 position = launchOrigin();
@@ -83,8 +83,8 @@ public class GameStateManager {
 	        if(timer >= 1) {
 	        	timer = 0;
 	        	launchRock(new Vector3(
-	        					Samuel.Left() + (float)Math.random() * Samuel.Width(),
-	        					Samuel.Bottom() + (float)Math.random() * Samuel.Height(),
+	        					Samuel.Left() + (float)(Math.random() * 0.5 + 0.5) * Samuel.Width(),
+	        					Samuel.Bottom() + (float)(Math.random() * 0.5 + 0.5) * Samuel.Height(),
 	        					0)
 	        			//(float)Math.random() * 0.5f + 2.5f
 	        			);     	
