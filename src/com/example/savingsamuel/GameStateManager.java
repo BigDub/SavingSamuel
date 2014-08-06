@@ -71,7 +71,7 @@ public class GameStateManager {
 				) {
 	        timer += elapsed;
 	        distractionTimer += elapsed;
-	        if(distractionTimer >= 3.8f) {
+	        if(distractionTimer >= 2.65f) {
 	        	distractionTimer = 0;
 	        	launchRock(new Vector3(
 	        					Samuel.Left() + (float)Math.random() * 6 * Samuel.Width() - 3 * Samuel.Width(),

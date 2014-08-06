@@ -95,8 +95,16 @@ public abstract class Projectile {
     		return;
     	}
     	float colrad = collisionRadius();
-    	if (_position.z > 0 && _velocity.z < 0 && _position.z - colrad + _velocity.z * elapsed <= 0) {
+    	if (_position.z > 0 && _velocity.z < 0 && _position.z + _velocity.z * elapsed <= 0) {
     		float wall = Wall.Top();
+    		if(
+    				_position.x + colrad >= Samuel.Left() &&
+    				_position.x - colrad <= Samuel.Left() + Samuel.Width() &&
+    				_position.y >= wall &&
+    				_position.y - colrad <= wall + Samuel.Height()
+    				) {
+    			AudioManager.playWilhelm();
+    		}
     		if(_position.y <= wall) {
 	    		//Impact with wall
 	    		AudioManager.playImpact();
@@ -170,16 +178,19 @@ public abstract class Projectile {
     }
     
     private boolean _onTarget() {
-    	if(_position.z > 0 && _velocity.z >= 0)
+    	if(_velocity.z >= 0 || _position.z < 0)
     		return false;
     	float colRad = collisionRadius(),
     			flightTime = _position.z / -_velocity.z,
     			projectedX = _position.x + _velocity.x * flightTime,
     			projectedY = _position.y + _velocity.y * flightTime + (-9.8f / 2f) * flightTime * flightTime;
-    	return (projectedX + colRad >= Samuel.Left() &&
-    			projectedX - colRad <= Samuel.Left() + Samuel.Width() &&
-    			projectedY + colRad >= Samuel.Bottom() &&
-    			projectedY - colRad <= Samuel.Bottom() + Samuel.Height());
+    	
+    	return (
+    			projectedX + colRad >= Samuel.Left() - 0.5f * Samuel.Width() &&
+    			projectedX - colRad <= Samuel.Left() + 1.5f * Samuel.Width() &&
+    			projectedY + colRad >= Samuel.Bottom() //&&
+    			//projectedY - colRad * 2 <= Samuel.Bottom() + Samuel.Height()
+    			);
     }
     private void _draw() {
     	float[] mMVPMatrix = new float[16];
