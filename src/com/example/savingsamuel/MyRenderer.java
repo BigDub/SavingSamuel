@@ -48,12 +48,12 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	
 	@Override
 	public void onDrawFrame(GL10 gl) {
-		GameStateManager.Instance().update();
+		GameStateManager.Update();
 		
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT);
         
-        Projectile.drawPre();
+        Projectile.DrawPre();
         
 
         GLES20.glEnable(GLES20.GL_STENCIL_TEST);
@@ -61,19 +61,19 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         GLES20.glStencilMask(0xFF);
         GLES20.glClear(GLES20.GL_STENCIL_BUFFER_BIT);
         
-        Wall.draw();
-        Samuel.draw();
+        Samuel.Draw();
+        Wall.Draw();
         
         GLES20.glStencilFunc(GLES20.GL_EQUAL, 1, 0xFF);
         GLES20.glStencilMask(0x00);
         
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
-        Projectile.drawShadow();
+        Projectile.DrawShadow();
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         
         GLES20.glDisable(GLES20.GL_STENCIL_TEST);
         
-        Projectile.drawPost();
+        Projectile.DrawPost();
 	}
 
 	@Override

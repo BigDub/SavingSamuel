@@ -1,7 +1,11 @@
 package com.example.savingsamuel;
 
+import android.opengl.Matrix;
+
 
 public class Samuel {
+	private static Samuel _instance;
+
 	private static float
 		_height,
 		_width,
@@ -13,6 +17,10 @@ public class Samuel {
     
     private static Mesh _mesh;
 
+	public static void Init() {
+		_instance = new Samuel();
+	}
+	public static Vector3 Position() { return _instance._position; }
     public static float Left() {
     	return _left;
     }
@@ -33,13 +41,13 @@ public class Samuel {
 		_width = ((float)texture.Width() / (float)texture.Height()) * scale;
 		_left = -0.5f * _width;
         _vertices = new float[] {
-        	    _left,  _bottom + _height, 0.0f,	// top left
+        	    _left,  _height, 0.0f,	// top left
         		0f, 0f,
-        	    _left, _bottom, 0.0f,	// bottom left
+        	    _left, 0f, 0.0f,	// bottom left
         	    0f, 1f,
-        	    _left + _width, _bottom, 0.0f, 	// bottom right
+        	    _left + _width, 0f, 0.0f, 	// bottom right
         	    1f, 1f,
-        	 	_left + _width,  _bottom + _height, 0.0f,	// top right
+        	 	_left + _width, _height, 0.0f,	// top right
         	 	1f, 0f
         	 	};
         
@@ -47,7 +55,42 @@ public class Samuel {
 
     }
     
-    public static void draw() {
-        _mesh.draw(MyRenderer.mVPMatrix(), Shader.Textured());
+    public static void Draw() {
+        _instance._draw();
+    }
+    public static void Update(float elapsed) {
+    	_instance._update(elapsed);
+    }
+    public static void Reset() {
+    	_instance._reset();
+    }
+    
+    private Vector3 _position, _velocity;
+    private boolean _falling;
+    
+    private Samuel() {
+    	_reset();
+    }
+    
+    private void _reset() {
+    	_falling = false;
+    	_velocity = new Vector3(0);
+    	_position = new Vector3(0, _bottom, 0);
+    }
+    
+    private void _update(float elapsed) {
+    	if(!_falling)
+    		return;
+    	_position.Add(Vector3.Scale(_velocity, elapsed));
+    }
+    
+    private void _draw() {
+    	float[] mMVPMatrix = new float[16];
+        float[] mWorldMatrix = new float[16];
+        Matrix.setIdentityM(mWorldMatrix, 0);
+        Matrix.translateM(mWorldMatrix, 0, _position.x, _position.y, _position.z);
+        Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mWorldMatrix, 0);
+        
+    	_mesh.Draw(mMVPMatrix, Shader.Textured());
     }
 }

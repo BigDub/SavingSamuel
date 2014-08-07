@@ -8,11 +8,11 @@ import java.nio.ShortBuffer;
 import android.opengl.GLES20;
 
 public class ColoredMesh extends Mesh {
-	protected int iTexture;
+	private static int BYTES_PER_VERTEX = 4 * (3 + 4);
+
 	protected final FloatBuffer vertexBuffer;
 	protected final ShortBuffer indexBuffer;
-	
-	private static int BYTES_PER_VERTEX = 4 * (3 + 4);
+	protected int iTexture;
 	
 	public ColoredMesh(float[] vertices, short[] indices) {
 		ByteBuffer vb = ByteBuffer.allocateDirect(4 * vertices.length);
@@ -28,7 +28,7 @@ public class ColoredMesh extends Mesh {
 	}
 
 	@Override
-	public void draw(float[] mMVPMatrix, Shader mProgram) {
+	public void Draw(float[] mMVPMatrix, Shader mProgram) {
 		//int mProgram = ShaderProgram.VaryingColor();
         // Add program to OpenGL ES environment
         GLES20.glUseProgram(mProgram.Program());

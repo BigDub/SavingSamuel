@@ -8,11 +8,11 @@ import android.opengl.Matrix;
 
 
 public abstract class Projectile {
-	protected static Vector<Projectile> _projectiles, _preList, _postList;
 	private static float _effectTimer = 0, _tint;
-	private boolean _warnOn;
 	private static int _pendingKnock = 0;
 	private static float _knockX, _knockY;
+	
+	protected static Vector<Projectile> _projectiles, _preList, _postList;
 	
 	public static void Init() {
 		_projectiles = new Vector<Projectile>();
@@ -50,25 +50,60 @@ public abstract class Projectile {
         if(_effectTimer >= Math.PI * 2)
         	_effectTimer -= Math.PI * 2;
 	}
-
 	public static void Knock(float x, float y) {
 		if(_pendingKnock != 2) {
 			_pendingKnock = 1;
 			_knockX = x;
 			_knockY = y;
 		}
-	}
-	
-    protected abstract Mesh mesh();
-    protected abstract float collisionRadius();
-    private boolean _active;
-    protected float
-    	_rotation, _spin,
-    	_screenX, _screenY, _screenRad;
-    protected Vector3
-    	_scale,
-    	_position,
-    	_velocity;
+	}	
+	public static void DrawPre() {
+    	Vector<Projectile> removeList = new Vector<Projectile>(1);
+    	for(Projectile p : _projectiles) {
+    		if(p._active) {
+    			if(p._position.z < 0) {
+    				_preList.add(p);
+    			} else {
+    				_postList.add(p);
+    			}
+    		} else {
+    			removeList.add(p);
+    		}
+    	}
+    	for(Projectile p : removeList)
+    		_projectiles.remove(p);
+    	Collections.sort(_preList, ProjectileComparator.Instance());
+    	Collections.sort(_postList, ProjectileComparator.Instance());
+    	
+        _tint = (float)(Math.cos(_effectTimer * Math.PI * 4) / 4.0d + 0.75d);
+        GLES20.glUniform4f(
+        		GLES20.glGetUniformLocation(Shader.TintedTexture().Program(), "uTint"),
+        		1f, _tint, _tint, 1f);
+    	
+    	for(Projectile p : _preList) {
+    		p._draw();
+    	}
+    }
+    public static void DrawShadow() {
+    	for(Projectile p : _postList) {
+    		p._drawShadow();
+    	}
+    }
+    public static void DrawPost() {
+    	for(Projectile p : _postList) {
+    		p._draw();
+    	}
+    	_preList.clear();
+    	_postList.clear();
+    }
+    public static void Reset() {
+    	Init();
+    }
+    
+    private boolean _active, _warnOn;
+    
+    protected float _rotation, _spin, _screenX, _screenY, _screenRad;
+    protected Vector3 _scale, _position, _velocity;
     
     public Projectile() {
     	_active = false;
@@ -76,23 +111,7 @@ public abstract class Projectile {
     	_position = new Vector3();
     	_velocity = new Vector3();
     }
-    
-    protected void _launch(float rotation, float spin, Vector3 scale, Vector3 position, Vector3 velocity, boolean warn) {
-    	_active = true;
-    	_rotation = rotation;
-    	_spin = spin;
-    	_scale = scale;
-    	_position = position;
-    	_velocity = velocity;
-    	
-    	//dependent on other values
-    	if(GameStateManager.WarnEffect()) {
-    		_warnOn = warn;
-    	} else {
-    		_warnOn = false;
-    	}
-    }
-    
+
     private void _update(float elapsed) {
     	if (_position.y <= 0 && _velocity.y <= 0) {
     		_active = false;
@@ -143,48 +162,7 @@ public abstract class Projectile {
         test = new float[] { _position.x + colrad, _position.y, _position.z, 1 };
         Matrix.multiplyMV(output, 0, MyRenderer.mVPMatrix(), 0, test, 0);
         _screenRad = (((output[0] / output[3]) + 1f) / 2f * MyRenderer.Width()) - _screenX;
-    }
-    
-    public static void drawPre() {
-    	Vector<Projectile> removeList = new Vector<Projectile>(1);
-    	for(Projectile p : _projectiles) {
-    		if(p._active) {
-    			if(p._position.z < 0) {
-    				_preList.add(p);
-    			} else {
-    				_postList.add(p);
-    			}
-    		} else {
-    			removeList.add(p);
-    		}
-    	}
-    	for(Projectile p : removeList)
-    		_projectiles.remove(p);
-    	Collections.sort(_preList, ProjectileComparator.Instance());
-    	Collections.sort(_postList, ProjectileComparator.Instance());
-    	
-        _tint = (float)(Math.cos(_effectTimer * Math.PI * 4) / 4.0d + 0.75d);
-        GLES20.glUniform4f(
-        		GLES20.glGetUniformLocation(Shader.TintedTexture().Program(), "uTint"),
-        		1f, _tint, _tint, 1f);
-    	
-    	for(Projectile p : _preList) {
-    		p._draw();
-    	}
-    }
-    public static void drawShadow() {
-    	for(Projectile p : _postList) {
-    		p._drawShadow();
-    	}
-    }
-    public static void drawPost() {
-    	for(Projectile p : _postList) {
-    		p._draw();
-    	}
-    	_preList.clear();
-    	_postList.clear();
-    }
-    
+    }   
     private void _updateEffects() {
     	if(GameStateManager.WarnEffect()) {
     		_warnOn = _onTarget();
@@ -201,10 +179,10 @@ public abstract class Projectile {
     			projectedY = _position.y + _velocity.y * flightTime + (-9.8f / 2f) * flightTime * flightTime;
     	
     	return (
-    			projectedX + colRad >= Samuel.Left() &&// - 0.5f * Samuel.Width() &&
-    			projectedX - colRad <= Samuel.Left() + /*1.5f **/ Samuel.Width() &&
-    			projectedY + colRad >= Samuel.Bottom() //&&
-    			//projectedY - colRad * 2 <= Samuel.Bottom() + Samuel.Height()
+    			projectedX + colRad >= Samuel.Left() &&
+    			projectedX - colRad <= Samuel.Left() + Samuel.Width() &&
+    			projectedY + colRad >= Samuel.Bottom() &&
+    			projectedY - colRad <= Samuel.Bottom() + Samuel.Height()
     			);
     }
     private void _draw() {
@@ -217,11 +195,10 @@ public abstract class Projectile {
         Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mWorldMatrix, 0);
 
         if(_warnOn)
-        	mesh().draw(mMVPMatrix, Shader.TintedTexture());
+        	mesh().Draw(mMVPMatrix, Shader.TintedTexture());
         else
-        	mesh().draw(mMVPMatrix, Shader.Textured());
-    }
-    
+        	mesh().Draw(mMVPMatrix, Shader.Textured());
+    }    
     private void _drawShadow() {
     	float[] mMVPMatrix = new float[16];
         float[] mWorldMatrix = new float[16];
@@ -231,6 +208,23 @@ public abstract class Projectile {
         Matrix.scaleM(mWorldMatrix, 0, _scale.x, offset, _scale.z);
         Matrix.rotateM(mWorldMatrix, 0, _rotation, 0f, 0f, 1f);
         Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mWorldMatrix, 0);
-        mesh().draw(mMVPMatrix, Shader.Shadow());
+        mesh().Draw(mMVPMatrix, Shader.Shadow());
+    }
+    
+    protected abstract Mesh mesh();
+    protected abstract float collisionRadius();
+    protected void _launch(float rotation, float spin, Vector3 scale, Vector3 position, Vector3 velocity, boolean warn) {
+    	_active = true;
+    	_rotation = rotation;
+    	_spin = spin;
+    	_scale = scale;
+    	_position = position;
+    	_velocity = velocity;
+    	
+    	if(GameStateManager.WarnEffect()) {
+    		_warnOn = warn;
+    	} else {
+    		_warnOn = false;
+    	}
     }
 }

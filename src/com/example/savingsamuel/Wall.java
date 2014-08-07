@@ -38,7 +38,7 @@ public class Wall {
         _mesh = new ColoredMesh(_vertices, _drawOrder);
     }
     
-    public static void draw() {
-        _mesh.draw(_mMVPMatrix, Shader.VaryingColor());
+    public static void Draw() {
+        _mesh.Draw(_mMVPMatrix, Shader.VaryingColor());
     }
 }
