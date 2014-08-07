@@ -33,9 +33,9 @@ public class Rock extends Projectile{
 		Projectile._projectiles.add(this);
 	}
 	
-	public static void Launch(float rotation, float spin, Vector3 scale, Vector3 position, Vector3 velocity) {
+	public static void Launch(float rotation, float spin, Vector3 scale, Vector3 position, Vector3 velocity, boolean warn) {
 		Rock rock = new Rock();
-		rock._launch(rotation, spin, scale, position, velocity);
+		rock._launch(rotation, spin, scale, position, velocity, warn);
 	}
 
 	@Override

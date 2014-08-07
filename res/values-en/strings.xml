@@ -5,4 +5,17 @@
     
 	<string name="pref_mute_title">Mute</string>
 	<string name="pref_mute_summary">Disables game sounds.</string>
+	
+	<string name="pref_warn_title">Warning Effect</string>
+	<string name="pref_warn_summary">Makes projectiles heading toward Samuel flash red.</string>
+	
+	<string name="pref_dif_title">Tapping Difficulty</string>
+	<string name="pref_dif_summary">Defines how easy it is to tap a target.</string>
+	<string name="pref_dif_dialog">Tapping Difficulty</string>
+	<string-array name="pref_dif_labels">
+	    <item>Exact</item>
+	    <item>Hard</item>
+	    <item>Easy</item>
+	    <item>I have a tiny screen</item>
+	</string-array>
 </resources>

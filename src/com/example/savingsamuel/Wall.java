@@ -9,13 +9,13 @@ public class Wall {
 	private static float[] _mMVPMatrix = new float[16];
     private static final float _vertices[] = {
 	    -0.5f,  _top, 0.0f,	// top left
-		0.96f, 0.78f, 0.45f, 1.0f,
+		0.757f, 0.792f, 0.769f, 1.0f,
 	    -0.5f, 0f, 0.0f,	// bottom left
-	    0.94f, 0.66f, 0.18f, 1.0f,
+	    0.310f, 0.443f, 0.376f, 1.0f,
 	    0.5f, 0f, 0.0f, 	// bottom right
-	    0.94f, 0.66f, 0.18f, 1.0f,
+	    0.310f, 0.443f, 0.376f, 1.0f,
 	 	0.5f,  _top, 0.0f,	// top right
-	 	0.96f, 0.78f, 0.45f, 1.0f
+	 	0.757f, 0.792f, 0.769f, 1.0f
 	 	};
 
     private static final short _drawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices

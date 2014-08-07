@@ -10,9 +10,10 @@ import android.opengl.Matrix;
 public abstract class Projectile {
 	protected static Vector<Projectile> _projectiles, _preList, _postList;
 	private static float _effectTimer = 0, _tint;
-	private boolean _effectOn;
+	private boolean _warnOn;
 	private static int _pendingKnock = 0;
-	private static float _knockX, _knockY, _knockRadius;
+	private static float _knockX, _knockY;
+	
 	public static void Init() {
 		_projectiles = new Vector<Projectile>();
 		_preList = new Vector<Projectile>();
@@ -29,13 +30,13 @@ public abstract class Projectile {
 					float dx = _knockX - p._screenX;
 					float dy = _knockY - p._screenY;
 					float diff = (float)Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-					if(diff <= _knockRadius) {
+					if(diff <= p._screenRad * GameStateManager.TapScale()) {
 						hit = true;
 						Vector3 push = Vector3.Subtract(p._position, GameStateManager.CameraPosition());
 						//push.y = 0;
 						p._spin *= 0.75f;
 						p._velocity.Scale(0.9f).Add(push.Normalize().Scale(6));
-						p._effectOn = p._onTarget();
+						p._updateEffects();
 					}
 				}
 				p._update(elapsed);
@@ -49,13 +50,12 @@ public abstract class Projectile {
         if(_effectTimer >= Math.PI * 2)
         	_effectTimer -= Math.PI * 2;
 	}
-	
-	public static void Knock(float x, float y, float radius) {
+
+	public static void Knock(float x, float y) {
 		if(_pendingKnock != 2) {
 			_pendingKnock = 1;
 			_knockX = x;
 			_knockY = y;
-			_knockRadius = radius;
 		}
 	}
 	
@@ -64,7 +64,7 @@ public abstract class Projectile {
     private boolean _active;
     protected float
     	_rotation, _spin,
-    	_screenX, _screenY;
+    	_screenX, _screenY, _screenRad;
     protected Vector3
     	_scale,
     	_position,
@@ -72,12 +72,12 @@ public abstract class Projectile {
     
     public Projectile() {
     	_active = false;
-    	_effectOn = false;
+    	_warnOn = false;
     	_position = new Vector3();
     	_velocity = new Vector3();
     }
     
-    protected void _launch(float rotation, float spin, Vector3 scale, Vector3 position, Vector3 velocity) {
+    protected void _launch(float rotation, float spin, Vector3 scale, Vector3 position, Vector3 velocity, boolean warn) {
     	_active = true;
     	_rotation = rotation;
     	_spin = spin;
@@ -86,7 +86,11 @@ public abstract class Projectile {
     	_velocity = velocity;
     	
     	//dependent on other values
-    	_effectOn = _onTarget();
+    	if(GameStateManager.WarnEffect()) {
+    		_warnOn = warn;
+    	} else {
+    		_warnOn = false;
+    	}
     }
     
     private void _update(float elapsed) {
@@ -111,7 +115,7 @@ public abstract class Projectile {
 	    		_position.z = colrad;
 	    		_velocity = Vector3.Bounce(_velocity, Vector3.UnitZ()).Scale(0.2f);
 	    		_spin /= -2f;
-	    		_effectOn = false;
+	    		_warnOn = false;
     		} else if(_position.y - colrad <= wall) {
     			//Impact with top of the wall
     			Vector3 normal = new Vector3(
@@ -123,7 +127,7 @@ public abstract class Projectile {
 	    		_position = Vector3.Scale(normal, colrad).Add(new Vector3(_position.x, wall, 0));
 	    		_velocity = Vector3.Bounce(_velocity, Vector3.UnitZ()).Scale(0.2f);
 	    		_spin /= -2f;
-	    		_effectOn = _onTarget();
+	    		_updateEffects();
     		}
     	}
 		_position.Add(Vector3.Scale(_velocity, elapsed));
@@ -135,6 +139,10 @@ public abstract class Projectile {
         Matrix.multiplyMV(output, 0, MyRenderer.mVPMatrix(), 0, test, 0);
         _screenX = ((output[0] / output[3]) + 1f) / 2f * MyRenderer.Width();
         _screenY = ((-output[1] / output[3]) + 1f) / 2f * MyRenderer.Height();
+        
+        test = new float[] { _position.x + colrad, _position.y, _position.z, 1 };
+        Matrix.multiplyMV(output, 0, MyRenderer.mVPMatrix(), 0, test, 0);
+        _screenRad = (((output[0] / output[3]) + 1f) / 2f * MyRenderer.Width()) - _screenX;
     }
     
     public static void drawPre() {
@@ -177,6 +185,13 @@ public abstract class Projectile {
     	_postList.clear();
     }
     
+    private void _updateEffects() {
+    	if(GameStateManager.WarnEffect()) {
+    		_warnOn = _onTarget();
+    	} else {
+    		_warnOn = false;
+    	}
+    }
     private boolean _onTarget() {
     	if(_velocity.z >= 0 || _position.z < 0)
     		return false;
@@ -186,8 +201,8 @@ public abstract class Projectile {
     			projectedY = _position.y + _velocity.y * flightTime + (-9.8f / 2f) * flightTime * flightTime;
     	
     	return (
-    			projectedX + colRad >= Samuel.Left() - 0.5f * Samuel.Width() &&
-    			projectedX - colRad <= Samuel.Left() + 1.5f * Samuel.Width() &&
+    			projectedX + colRad >= Samuel.Left() &&// - 0.5f * Samuel.Width() &&
+    			projectedX - colRad <= Samuel.Left() + /*1.5f **/ Samuel.Width() &&
     			projectedY + colRad >= Samuel.Bottom() //&&
     			//projectedY - colRad * 2 <= Samuel.Bottom() + Samuel.Height()
     			);
@@ -201,7 +216,7 @@ public abstract class Projectile {
         Matrix.scaleM(mWorldMatrix, 0, _scale.x, _scale.y, _scale.z);
         Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mWorldMatrix, 0);
 
-        if(_effectOn)
+        if(_warnOn)
         	mesh().draw(mMVPMatrix, Shader.TintedTexture());
         else
         	mesh().draw(mMVPMatrix, Shader.Textured());

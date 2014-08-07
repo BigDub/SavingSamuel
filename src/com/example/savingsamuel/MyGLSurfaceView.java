@@ -17,7 +17,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 		
 		switch(e.getAction()) {
 		case MotionEvent.ACTION_DOWN:
-			Projectile.Knock(x, y, 30);
+			Projectile.Knock(x, y);
 			break;
 		}
 		return true;
