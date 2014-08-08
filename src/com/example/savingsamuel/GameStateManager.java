@@ -8,8 +8,9 @@ public class GameStateManager {
 	private static final Vector3 _cameraPosition = new Vector3(0, Wall.Top(), Wall.Top() / 2);
 	private static final float 
 		_initialSafeTime = 2,
+		_lossWait = 5,
 		_difficultyRampTime = 1,
-		_difficultyRampLength = 180f / _difficultyRampTime,
+		_difficultyRampLength = 60f / _difficultyRampTime,
 		
 		_rockDelayMeanInitial = 2,
 		_rockDelayMeanFinal = 0.8f,
@@ -18,8 +19,9 @@ public class GameStateManager {
 		_rockDelayDeviationInitial = 0.25f,
 		_rockDelayDeviationFinal = 0.1f,
 		_rockDelayDeviationDecay = (_rockDelayDeviationFinal - _rockDelayDeviationInitial) / _difficultyRampLength;
-	private static GameStateManager _instance;
+	private static GameStateManager _instance = new GameStateManager();
 	
+	public static GameStateManager Instance() { return _instance; }
 	public static Vector3 CameraPosition() { return _cameraPosition; }
 	public static void updatePreferences(SharedPreferences sharedPref) {
 		AudioManager.updateMute(sharedPref.getBoolean("pref_mute", false));
@@ -27,16 +29,17 @@ public class GameStateManager {
 		_instance._warnEffect = sharedPref.getBoolean("pref_warn", true);
 	}
 	public static void Init(Context context) {
-		_instance = new GameStateManager();
         Projectile.Init();
         AudioManager.Init(context);
 		Shader.Init(context);
 		Texture.Init(context);
 		Samuel.Init();
-		_instance.newGame();
+		_instance._newGame();
 	}
 	public static boolean WarnEffect() {
-		return _instance._warnEffect;
+		if(_instance._gamestate == GameState.RUNNING)
+			return _instance._warnEffect;
+		return false;
 	}
 	public static float TapScale() {
 		switch(_instance._difficulty) {
@@ -55,9 +58,23 @@ public class GameStateManager {
 	public static void Update() {
 		_instance._update();
 	}
+	public static void SamuelHit() {
+		_instance._samuelHit();
+	}
+	public static void NewGame() {
+		_instance._newGame();
+	}
+	public static void RampDifficulty() {
+		_instance._rampDifficulty();
+	}
+	public static void NewRock() {
+		_instance._newRock();
+	}
+	public static void NewDistraction() {
+		_instance._newDistraction();
+	}
 	
 	private long _uptime;
-	private float _rockTimer, _distractionTimer, _difficultyTimer;
 	private int _gamestate, _difficulty;
 	// Lower numbers means harder difficulty
 	private boolean _warnEffect;
@@ -97,45 +114,16 @@ public class GameStateManager {
         float elapsed = (float) (nuptime - _uptime) / 1000f;
         _uptime = nuptime;
         
+        Timer.Update(elapsed);
+        
 		if(_gamestate == GameState.RUNNING) {
-	        _rockTimer -= elapsed;
-	        _distractionTimer -= elapsed;
-	        _difficultyTimer -= elapsed;
-	        if(_difficultyTimer <= 0) {
-	        	_difficultyTimer += _difficultyRampTime;
-	        	if(_rockDelayTime.Mean() > _rockDelayMeanFinal) {
-	        		_rockDelayTime.ShiftMean(_rockDelayMeanDecay);
-	        	}
-	        	if(_rockDelayTime.StandardDeviation() > _rockDelayDeviationFinal) {
-	        		_rockDelayTime.ShiftStandardDeviation(_rockDelayDeviationDecay);
-	        	}
-	        }
-	        if(_distractionTimer <= 0) {
-	        	_distractionTimer += _distractionDelayTime.GetRandom();
-	        	launchRock(new Vector3(
-	        					Samuel.Left() + (float)Math.random() * 6 * Samuel.Width() - 3 * Samuel.Width(),
-	        					Samuel.Bottom() - ((float)Math.random() + 1) * Samuel.Height(),
-	        					0),
-	        					false
-	        			); 
-	        }
-	        if(_rockTimer <= 0) {
-	        	_rockTimer += _rockDelayTime.GetRandom();
-	        	launchRock(new Vector3(
-	        					Samuel.Left() + (float)(Math.random() * 0.5 + 0.5) * Samuel.Width(),
-	        					Samuel.Bottom() + (float)(Math.random() * 0.5 + 0.5) * Samuel.Height(),
-	        					0),
-	        					true
-	        			);     	
-
-	        }
 	        Projectile.Update(elapsed);
 		} else if (_gamestate == GameState.LOSING) {
 			Samuel.Update(elapsed);
 	        Projectile.Update(elapsed);
 		}
 	}
-	private void newGame() {
+	private void _newGame() {
 		Samuel.Reset();
 		Projectile.Reset();
 		_rockFlightTime = new FloatDistribution(3f, 0.1f);
@@ -146,10 +134,45 @@ public class GameStateManager {
 				0, 0,
 				5, 1
 				);
-		_rockTimer = _rockDelayTime.GetRandom() + _initialSafeTime;
-		_distractionTimer = _distractionDelayTime.GetRandom() + _initialSafeTime;
-		_difficultyTimer = _difficultyRampTime + _initialSafeTime;
-		_gamestate = GameState.RUNNING;
+		   
+    	new Timer(this, _rockDelayTime.GetRandom(), "NewRock", _initialSafeTime);
+    	new Timer(this, _distractionDelayTime.GetRandom(), "NewDistraction", _initialSafeTime);
+		new Timer(this, _difficultyRampTime, "RampDifficulty", _initialSafeTime, true);
+		
 		_uptime = SystemClock.uptimeMillis();
+		_gamestate = GameState.RUNNING;
+	}
+	private void _samuelHit() {
+		if(_gamestate == GameState.RUNNING) {
+			_gamestate = GameState.LOSING;
+			Timer.Drop();
+			new Timer(this, _lossWait, "NewGame");
+		}
+	}
+	private void _rampDifficulty() {
+		if(_rockDelayTime.Mean() > _rockDelayMeanFinal) {
+    		_rockDelayTime.ShiftMean(_rockDelayMeanDecay);
+    	}
+    	if(_rockDelayTime.StandardDeviation() > _rockDelayDeviationFinal) {
+    		_rockDelayTime.ShiftStandardDeviation(_rockDelayDeviationDecay);
+    	}
+	}
+	private void _newRock() {
+		launchRock(new Vector3(
+				Samuel.Left() + (float)(Math.random() * 0.5 + 0.5) * Samuel.Width(),
+				Samuel.Bottom() + (float)(Math.random() * 0.5 + 0.5) * Samuel.Height(),
+				0),
+				true
+		);   
+    	new Timer(this, _rockDelayTime.GetRandom(), "NewRock");
+	}
+	private void _newDistraction() {
+    	launchRock(new Vector3(
+    					Samuel.Left() + (float)Math.random() * 6 * Samuel.Width() - 3 * Samuel.Width(),
+    					Samuel.Bottom() - ((float)Math.random() + 1) * Samuel.Height(),
+    					0),
+    					false
+    			);
+    	new Timer(this, _distractionDelayTime.GetRandom(), "NewDistraction");
 	}
 }

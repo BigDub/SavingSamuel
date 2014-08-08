@@ -76,7 +76,11 @@ public abstract class Projectile {
     	Collections.sort(_preList, ProjectileComparator.Instance());
     	Collections.sort(_postList, ProjectileComparator.Instance());
     	
-        _warnPercent = (float)(Math.cos(_effectTimer * Math.PI * 4) / 2d + 0.5d);
+    	if(GameStateManager.WarnEffect()) {
+    		_warnPercent = (float)(Math.cos(_effectTimer * Math.PI * 4) / 2d + 0.5d);
+    	} else {
+    		_warnPercent = 0;
+    	}
         
     	
     	for(Projectile p : _preList) {
@@ -119,13 +123,18 @@ public abstract class Projectile {
     	float colrad = collisionRadius();
     	if (_position.z > 0 && _velocity.z < 0 && _position.z - colrad + _velocity.z * elapsed <= 0) {
     		float wall = Wall.Top();
-    		if(
-    				_position.x + colrad >= Samuel.Left() &&
-    				_position.x - colrad <= Samuel.Left() + Samuel.Width() &&
-    				_position.y >= wall &&
-    				_position.y - colrad <= wall + Samuel.Height()
-    				) {
-    			AudioManager.playWilhelm();
+    		if(Samuel.Hit(_position, colrad)) {
+    			Samuel.Knock(_velocity);
+	    		AudioManager.playImpact();
+    			_velocity = Vector3.Bounce(_velocity,
+    					Vector3.Subtract(_position,
+    							new Vector3(
+    									Samuel.Left() + 0.5f * Samuel.Width(),
+    									Samuel.Bottom() + 0.5f * Samuel.Height(),
+    									0
+    									)).Normal()).Scale(0.2f);
+	    		_spin /= -1.5f;
+	    		_warnOn = false;
     		}
     		if(_position.y <= wall) {
 	    		//Impact with wall

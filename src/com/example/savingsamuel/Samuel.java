@@ -22,18 +22,10 @@ public class Samuel {
 		_instance = new Samuel();
 	}
 	public static Vector3 Position() { return _instance._position; }
-    public static float Left() {
-    	return _left;
-    }
-    public static float Width() {
-    	return _width;
-    }
-    public static float Height() {
-    	return _height;
-    }
-    public static float Bottom() {
-    	return _bottom;
-    }
+    public static float Left() { return _left; }
+    public static float Width() { return _width; }
+    public static float Height() { return _height; }
+    public static float Bottom() { return _bottom; }
     public static void Load() {
     	Texture texture = Texture.loadTexture("samuel");
     	
@@ -55,7 +47,6 @@ public class Samuel {
         _mesh = new TexturedMesh(_vertices, _drawOrder, Texture.loadTexture("samuel"));
 
     }
-    
     public static void Draw() {
         _instance._draw();
     }
@@ -64,6 +55,23 @@ public class Samuel {
     }
     public static void Reset() {
     	_instance._reset();
+    }
+    public static void Knock(Vector3 incomingVelocity) {
+    	if(_instance._falling)
+    		return;
+    	_instance._falling = true;
+    	
+		AudioManager.playWilhelm();
+    	_instance._velocity = Vector3.Scale(incomingVelocity, 0.2f);
+    	_instance._velocity.y = 0;
+    	GameStateManager.SamuelHit();
+    }
+    public static boolean Hit(Vector3 position, float radius) {
+    	return !_instance._falling &&
+		position.x + radius > _left &&
+		position.x - radius < _left + _width &&
+		position.y + radius > _bottom &&
+		position.y - radius < _bottom + _height;
     }
     
     private Vector3 _position, _velocity;
@@ -83,6 +91,7 @@ public class Samuel {
     	if(!_falling)
     		return;
     	_position.Add(Vector3.Scale(_velocity, elapsed));
+    	_velocity.y -= 9.8f * elapsed;
     }
     
     private void _draw() {
