@@ -8,9 +8,10 @@ import android.opengl.Matrix;
 
 
 public abstract class Projectile {
-	private static float _effectTimer = 0, _warnTint;
+	private static float _effectTimer = 0, _warnPercent;
 	private static int _pendingKnock = 0;
 	private static float _knockX, _knockY;
+	private static Vector3 _warningTint = new Vector3(1, 0.5f, 0.5f);
 	
 	protected static Vector<Projectile> _projectiles, _preList, _postList;
 	
@@ -75,7 +76,7 @@ public abstract class Projectile {
     	Collections.sort(_preList, ProjectileComparator.Instance());
     	Collections.sort(_postList, ProjectileComparator.Instance());
     	
-        _warnTint = (float)(Math.cos(_effectTimer * Math.PI * 4) / 4.0d + 0.75d);
+        _warnPercent = (float)(Math.cos(_effectTimer * Math.PI * 4) / 2d + 0.5d);
         
     	
     	for(Projectile p : _preList) {
@@ -116,7 +117,7 @@ public abstract class Projectile {
     		return;
     	}
     	float colrad = collisionRadius();
-    	if (_position.z > 0 && _velocity.z < 0 && _position.z + _velocity.z * elapsed <= 0) {
+    	if (_position.z > 0 && _velocity.z < 0 && _position.z - colrad + _velocity.z * elapsed <= 0) {
     		float wall = Wall.Top();
     		if(
     				_position.x + colrad >= Samuel.Left() &&
@@ -186,7 +187,7 @@ public abstract class Projectile {
     private Vector3 _getTint() {
     	if(!_warnOn)
     		return _tint;
-    	return new Vector3(_tint.x, _tint.y * _warnTint, _tint.z * _warnTint);
+    	return Vector3.Add(Vector3.Scale(_warningTint, _warnPercent), Vector3.Scale(_tint, 1 - _warnPercent));
     }
     private void _draw() {
     	float[] mMVPMatrix = new float[16];

@@ -3,6 +3,7 @@ package com.example.savingsamuel;
 
 public class Rock extends Projectile{
 	private static Vector3Distribution _tints = new Vector3Distribution(0.97f, 0.04f, 0.97f, 0.02f, 0.97f, 0.02f);
+	private static FloatDistribution _shades = new FloatDistribution(0.3f, 0.1f);
 	private short _variation;
 	private static float _vertices[] = {
 	    -0.5f,  0.5f, 0.0f,	// top left
@@ -42,6 +43,12 @@ public class Rock extends Projectile{
 			_tint.y = _tint.x;
 		if(_tint.x > _tint.z)
 			_tint.z = _tint.x;
+		float shade = _shades.GetRandom();
+		if(shade > 0) {
+			_tint.x -= shade;
+			_tint.y -= shade;
+			_tint.z -= shade;
+		}
 		Projectile._projectiles.add(this);
 	}
 	
