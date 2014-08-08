@@ -33,7 +33,6 @@ public class TexturedMesh extends Mesh {
 	public void Draw(float[] mMVPMatrix, Shader mProgram) {
 		//int mProgram = ShaderProgram.Textured();
         // Add program to OpenGL ES environment
-        GLES20.glUseProgram(mProgram.Program());
 
         // get handle to vertex shader's vPosition member
         int mPositionHandle = mProgram.getVertexAttribute("vPosition");

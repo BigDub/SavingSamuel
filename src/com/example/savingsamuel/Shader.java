@@ -8,26 +8,31 @@ import android.opengl.GLES20;
 
 public class Shader {
 	private static Context _context;
-	private static Shader _uniformColor, _varyingColor, _textured, _shadow, _tinted;
+	private static Shader 
+		_uniformColor,
+		_varyingColor,
+		_textured,
+		_shadow,
+		_tinted;
 
 	
 	public static void Init(Context context) {
 		_context = context;
 		_uniformColor = new Shader(
-				_context.getString(R.string.vertexShaderAttributeP),
-				_context.getString(R.string.fragmentShaderUniformC));
+				R.string.vertexShaderAttributeP,
+				R.string.fragmentShaderUniformC);
 		_varyingColor = new Shader(
-				_context.getString(R.string.vertexShaderAttributePC),
-				_context.getString(R.string.fragmentShaderVaryingC));
+				R.string.vertexShaderAttributePC,
+				R.string.fragmentShaderVaryingC);
 		_textured = new Shader(
-				_context.getString(R.string.vertexShaderTextured),
-				_context.getString(R.string.fragmentShaderTextured));
+				R.string.vertexShaderTextured,
+				R.string.fragmentShaderTextured);
 		_shadow = new Shader(
-				_context.getString(R.string.vertexShaderTextured),
-				_context.getString(R.string.fragmentShaderShadow));
+				R.string.vertexShaderTextured,
+				R.string.fragmentShaderShadow);
 		_tinted = new Shader(
-				_context.getString(R.string.vertexShaderTextured),
-				_context.getString(R.string.fragmentShaderTinted));
+				R.string.vertexShaderTextured,
+				R.string.fragmentShaderTinted);
 	}
 	private static int loadShader(int type, String shaderCode){
 
@@ -41,29 +46,19 @@ public class Shader {
 
 	    return shader;
 	}
-	public static Shader UniformColor() {
-		return _uniformColor;
-	}
-	public static Shader VaryingColor() {
-		return _varyingColor;
-	}
-	public static Shader Textured() {
-		return _textured;
-	}
-	public static Shader Shadow() {
-		return _shadow;
-	}
-	public static Shader TintedTexture() {
-		return _tinted;
-	}
+	public static Shader UniformColor() { return _uniformColor;	}
+	public static Shader VaryingColor() { return _varyingColor;	}
+	public static Shader Textured() { return _textured; }
+	public static Shader Shadow() { return _shadow;	}
+	public static Shader TintedTexture() { return _tinted; }
 	
-	private int hProgram = -1, hVertexShader = -1, hFragmentShader = -1;
+	private int hProgram = 0, hVertexShader = 0, hFragmentShader = 0;
 	private String vertexShaderCode, fragmentShaderCode;
 	private Map<String, Integer> _handles;
 	
-	public Shader(String vsc, String fsc) {
-		this.vertexShaderCode = vsc;
-		this.fragmentShaderCode = fsc;
+	public Shader(int vsc, int fsc) {
+		this.vertexShaderCode = _context.getString(vsc);
+		this.fragmentShaderCode = _context.getString(fsc);
 		_handles = new HashMap<String, Integer>();
 	}
 	
@@ -72,7 +67,7 @@ public class Shader {
 			return _handles.get(name);
 		}
 		
-		int handle = GLES20.glGetUniformLocation(hProgram, name);
+		int handle = GLES20.glGetUniformLocation(Program(), name);
 		_handles.put(name, handle);
 		return handle;
 	}
@@ -82,24 +77,26 @@ public class Shader {
 			return _handles.get(name);
 		}
 		
-		int handle = GLES20.glGetAttribLocation(hProgram, name);
+		int handle = GLES20.glGetAttribLocation(Program(), name);
 		_handles.put(name, handle);
 		return handle;
 	}
 	
 	public int Program() {
-		if(hProgram == -1)
+		if(hProgram == 0)
 			compileProgram();
 		return hProgram;
 	}
 
 	private void compileProgram() {
-		this.hVertexShader = Shader.loadShader(GLES20.GL_VERTEX_SHADER, this.vertexShaderCode);
-		this.hFragmentShader = Shader.loadShader(GLES20.GL_FRAGMENT_SHADER, this.fragmentShaderCode);
-		this.hProgram = GLES20.glCreateProgram();
-		GLES20.glAttachShader(this.hProgram, this.hVertexShader);
-		GLES20.glAttachShader(this.hProgram, this.hFragmentShader);
-		GLES20.glLinkProgram(this.hProgram);
+		if(hVertexShader == 0)
+			hVertexShader = Shader.loadShader(GLES20.GL_VERTEX_SHADER, vertexShaderCode);
+		if(hFragmentShader == 0)
+			hFragmentShader = Shader.loadShader(GLES20.GL_FRAGMENT_SHADER, fragmentShaderCode);
+		hProgram = GLES20.glCreateProgram();
+		GLES20.glAttachShader(hProgram, hVertexShader);
+		GLES20.glAttachShader(hProgram, hFragmentShader);
+		GLES20.glLinkProgram(hProgram);
 	}
 	
 }

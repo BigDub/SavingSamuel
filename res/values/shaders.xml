@@ -50,7 +50,7 @@
 	      if(col.a == 0.0) {
 	      	discard;
 	      }
-	      gl_FragColor =  col;
+	      gl_FragColor = col;
 	    }
     </string>
     <string name="fragmentShaderShadow">

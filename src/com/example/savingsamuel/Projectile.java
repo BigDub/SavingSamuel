@@ -8,7 +8,7 @@ import android.opengl.Matrix;
 
 
 public abstract class Projectile {
-	private static float _effectTimer = 0, _tint;
+	private static float _effectTimer = 0, _warnTint;
 	private static int _pendingKnock = 0;
 	private static float _knockX, _knockY;
 	
@@ -75,10 +75,8 @@ public abstract class Projectile {
     	Collections.sort(_preList, ProjectileComparator.Instance());
     	Collections.sort(_postList, ProjectileComparator.Instance());
     	
-        _tint = (float)(Math.cos(_effectTimer * Math.PI * 4) / 4.0d + 0.75d);
-        GLES20.glUniform4f(
-        		GLES20.glGetUniformLocation(Shader.TintedTexture().Program(), "uTint"),
-        		1f, _tint, _tint, 1f);
+        _warnTint = (float)(Math.cos(_effectTimer * Math.PI * 4) / 4.0d + 0.75d);
+        
     	
     	for(Projectile p : _preList) {
     		p._draw();
@@ -103,7 +101,7 @@ public abstract class Projectile {
     private boolean _active, _warnOn;
     
     protected float _rotation, _spin, _screenX, _screenY, _screenRad;
-    protected Vector3 _scale, _position, _velocity;
+    protected Vector3 _scale, _position, _velocity, _tint;
     
     public Projectile() {
     	_active = false;
@@ -185,6 +183,11 @@ public abstract class Projectile {
     			projectedY - colRad <= Samuel.Bottom() + Samuel.Height()
     			);
     }
+    private Vector3 _getTint() {
+    	if(!_warnOn)
+    		return _tint;
+    	return new Vector3(_tint.x, _tint.y * _warnTint, _tint.z * _warnTint);
+    }
     private void _draw() {
     	float[] mMVPMatrix = new float[16];
         float[] mWorldMatrix = new float[16];
@@ -193,11 +196,13 @@ public abstract class Projectile {
         Matrix.rotateM(mWorldMatrix, 0, _rotation, 0f, 0f, 1f);
         Matrix.scaleM(mWorldMatrix, 0, _scale.x, _scale.y, _scale.z);
         Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mWorldMatrix, 0);
-
-        if(_warnOn)
-        	mesh().Draw(mMVPMatrix, Shader.TintedTexture());
-        else
-        	mesh().Draw(mMVPMatrix, Shader.Textured());
+    	
+        Vector3 tint = _getTint();
+        GLES20.glUseProgram(Shader.TintedTexture().Program());
+        GLES20.glUniform4f(
+        		Shader.TintedTexture().getUniform("uTint"),
+        		tint.x, tint.y, tint.z, 1f);
+    	mesh().Draw(mMVPMatrix, Shader.TintedTexture());
     }    
     private void _drawShadow() {
     	float[] mMVPMatrix = new float[16];
@@ -208,6 +213,11 @@ public abstract class Projectile {
         Matrix.scaleM(mWorldMatrix, 0, _scale.x, offset, _scale.z);
         Matrix.rotateM(mWorldMatrix, 0, _rotation, 0f, 0f, 1f);
         Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mWorldMatrix, 0);
+
+        GLES20.glUseProgram(Shader.Shadow().Program());
+        GLES20.glUniform4f(
+        		Shader.Shadow().getUniform("uTint"),
+        		0, 0, 0, 0.2f);
         mesh().Draw(mMVPMatrix, Shader.Shadow());
     }
     

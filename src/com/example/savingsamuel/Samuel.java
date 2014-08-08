@@ -1,5 +1,6 @@
 package com.example.savingsamuel;
 
+import android.opengl.GLES20;
 import android.opengl.Matrix;
 
 
@@ -91,6 +92,7 @@ public class Samuel {
         Matrix.translateM(mWorldMatrix, 0, _position.x, _position.y, _position.z);
         Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mWorldMatrix, 0);
         
+        GLES20.glUseProgram(Shader.Textured().Program());
     	_mesh.Draw(mMVPMatrix, Shader.Textured());
     }
 }

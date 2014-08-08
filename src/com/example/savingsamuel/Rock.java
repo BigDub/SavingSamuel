@@ -2,6 +2,7 @@ package com.example.savingsamuel;
 
 
 public class Rock extends Projectile{
+	private static Vector3Distribution _tints = new Vector3Distribution(0.97f, 0.04f, 0.97f, 0.02f, 0.97f, 0.02f);
 	private short _variation;
 	private static float _vertices[] = {
 	    -0.5f,  0.5f, 0.0f,	// top left
@@ -30,6 +31,17 @@ public class Rock extends Projectile{
 	private Rock() {
 		super();
 		_variation = (short)(Math.random() * 2f);
+		_tint = _tints.GetRandom();
+		if(_tint.x > 1)
+			_tint.x = 1;
+		if(_tint.y > 1)
+			_tint.y = 1;
+		if(_tint.z > 1)
+			_tint.z = 1;
+		if(_tint.x > _tint.y)
+			_tint.y = _tint.x;
+		if(_tint.x > _tint.z)
+			_tint.z = _tint.x;
 		Projectile._projectiles.add(this);
 	}
 	
