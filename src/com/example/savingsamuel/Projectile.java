@@ -33,7 +33,11 @@ public abstract class Projectile {
 					float diff = (float)Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 					if(diff <= p._screenRad * GameStateManager.TapScale()) {
 						hit = true;
-						GameStateManager.AddPoint();
+						if(!p._tapped) {
+							GameStateManager.AddPoint();
+							p._tapped = true;
+						}
+						
 						Vector3 push = Vector3.Subtract(p._position, GameStateManager.CameraPosition());
 						//push.y = 0;
 						p._spin *= 0.75f;
@@ -104,7 +108,7 @@ public abstract class Projectile {
     	Init();
     }
     
-    private boolean _active, _warnOn;
+    private boolean _active, _warnOn, _tapped;
     
     protected float _rotation, _spin, _screenX, _screenY, _screenRad;
     protected Vector3 _scale, _position, _velocity, _tint;
@@ -112,6 +116,7 @@ public abstract class Projectile {
     public Projectile() {
     	_active = false;
     	_warnOn = false;
+    	_tapped = false;
     	_position = new Vector3();
     	_velocity = new Vector3();
     }
