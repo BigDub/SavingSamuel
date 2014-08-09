@@ -55,7 +55,6 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         
         Projectile.DrawPre();
         
-
         GLES20.glEnable(GLES20.GL_STENCIL_TEST);
         GLES20.glStencilFunc(GLES20.GL_ALWAYS, 1, 0xFF);
         GLES20.glStencilMask(0xFF);

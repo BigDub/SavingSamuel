@@ -55,32 +55,27 @@ public class GameStateManager {
 			return 6;	
 		}
 	}
+	public static float Score() { return _instance._score; }
 	public static void Update() {
-		_instance._update();
+		if(_instance._hasFocus)
+			_instance._update();
 	}
-	public static void SamuelHit() {
-		_instance._samuelHit();
-	}
-	public static void NewGame() {
-		_instance._newGame();
-	}
-	public static void RampDifficulty() {
-		_instance._rampDifficulty();
-	}
-	public static void NewRock() {
-		_instance._newRock();
-	}
-	public static void NewDistraction() {
-		_instance._newDistraction();
-	}
+	public static void SamuelHit() { _instance._samuelHit(); }
+	public static void NewGame() { _instance._newGame(); }
+	public static void RampDifficulty() { _instance._rampDifficulty(); }
+	public static void NewRock() { _instance._newRock(); }
+	public static void NewDistraction() { _instance._newDistraction(); }
+	public static void AddPoint() { _instance._score++; }
+	public static void OnResume() { _instance._onResume(); }
+	public static void OnPause() { _instance._onPause(); }
 	
 	private long _uptime;
-	private int _gamestate, _difficulty;
+	private int _gamestate, _difficulty, _score;
 	// Lower numbers means harder difficulty
-	private boolean _warnEffect;
+	private boolean _warnEffect, _hasFocus;
 	private FloatDistribution _rockFlightTime, _rockDelayTime, _distractionDelayTime;
 	private Vector3Distribution _crowdArea;
-	private float _crowdOffset = 12;
+	private float _crowdOffset = 12, _timescale = 1;
 	
 	public GameStateManager() {}
 	
@@ -111,7 +106,7 @@ public class GameStateManager {
 	}
 	private void _update() {
         long nuptime = SystemClock.uptimeMillis();
-        float elapsed = (float) (nuptime - _uptime) / 1000f;
+        float elapsed = ((float) (nuptime - _uptime) / 1000f) * _timescale;
         _uptime = nuptime;
         
         Timer.Update(elapsed);
@@ -126,6 +121,8 @@ public class GameStateManager {
 	private void _newGame() {
 		Samuel.Reset();
 		Projectile.Reset();
+		_score = 0;
+		_timescale = 1;
 		_rockFlightTime = new FloatDistribution(3f, 0.1f);
 		_rockDelayTime = new FloatDistribution(_rockDelayMeanInitial, _rockDelayDeviationInitial);
 		_distractionDelayTime = new FloatDistribution(3, 0.5f);
@@ -174,5 +171,12 @@ public class GameStateManager {
     					false
     			);
     	new Timer(this, _distractionDelayTime.GetRandom(), "NewDistraction");
+	}
+	private void _onResume() {
+		_hasFocus = true;
+        _uptime = SystemClock.uptimeMillis();
+	}
+	private void _onPause() {
+		_hasFocus = false;
 	}
 }

@@ -33,6 +33,7 @@ public abstract class Projectile {
 					float diff = (float)Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
 					if(diff <= p._screenRad * GameStateManager.TapScale()) {
 						hit = true;
+						GameStateManager.AddPoint();
 						Vector3 push = Vector3.Subtract(p._position, GameStateManager.CameraPosition());
 						//push.y = 0;
 						p._spin *= 0.75f;

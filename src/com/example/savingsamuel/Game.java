@@ -26,5 +26,12 @@ public class Game extends Activity {
     	super.onResume();
     	SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
     	GameStateManager.updatePreferences(sharedPref);
+    	GameStateManager.OnResume();
+    }
+    
+    @Override
+    protected void onPause() {
+    	super.onPause();
+    	GameStateManager.OnPause();
     }
 }
