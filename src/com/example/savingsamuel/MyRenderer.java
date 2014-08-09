@@ -17,10 +17,14 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 	}
 	private static float[] _mProjectionMatrix = new float[16], 
 			_mViewMatrix = new float[16], 
-			_mVPMatrix = new float[16];
+			_mVPMatrix = new float[16],
+			_mOrthoMatrix = new float[16];
 	
 	public static float[] mVPMatrix() {
 		return _mVPMatrix;
+	}
+	public static float[] mOrthoMatrix() {
+		return _mOrthoMatrix;
 	}
 
 	@Override
@@ -44,6 +48,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         Wall.Load();
         Samuel.Load();
         Rock.Load();
+        NumberWriter.Load();
 	}
 	
 	@Override
@@ -68,9 +73,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
         Projectile.DrawShadow();
+        GLES20.glDisable(GLES20.GL_STENCIL_TEST);
+        NumberWriter.DrawNumber(Math.round(GameStateManager.Score()));
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         
-        GLES20.glDisable(GLES20.GL_STENCIL_TEST);
         
         Projectile.DrawPost();
 	}
@@ -83,7 +89,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
         float aspectRatio = (float) width / height;
         
-        
+        Matrix.orthoM(_mOrthoMatrix, 0, 0, width, 0, height, -1, 1);
         Matrix.frustumM(_mProjectionMatrix, 0, -aspectRatio, aspectRatio, -1, 1, 1, 50);
         Matrix.multiplyMM(_mVPMatrix, 0, _mProjectionMatrix, 0, _mViewMatrix, 0);
         Wall.setAspectRatio(aspectRatio);

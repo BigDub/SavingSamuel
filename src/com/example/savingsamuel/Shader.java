@@ -13,7 +13,8 @@ public class Shader {
 		_varyingColor,
 		_textured,
 		_shadow,
-		_tinted;
+		_tinted,
+		_numbers;
 
 	
 	public static void Init(Context context) {
@@ -33,6 +34,9 @@ public class Shader {
 		_tinted = new Shader(
 				R.string.vertexShaderTextured,
 				R.string.fragmentShaderTinted);
+		_numbers = new Shader(
+				R.string.vertexShaderNumbers,
+				R.string.fragmentShaderTextured);
 	}
 	private static int loadShader(int type, String shaderCode){
 
@@ -51,6 +55,7 @@ public class Shader {
 	public static Shader Textured() { return _textured; }
 	public static Shader Shadow() { return _shadow;	}
 	public static Shader TintedTexture() { return _tinted; }
+	public static Shader Numbers() { return _numbers; }
 	
 	private int hProgram = 0, hVertexShader = 0, hFragmentShader = 0;
 	private String vertexShaderCode, fragmentShaderCode;

@@ -44,7 +44,7 @@ public class Samuel {
         	 	1f, 0f
         	 	};
         
-        _mesh = new TexturedMesh(_vertices, _drawOrder, Texture.loadTexture("samuel"));
+        _mesh = new TexturedMesh(_vertices, _drawOrder, texture);
 
     }
     public static void Draw() {

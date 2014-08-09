@@ -65,7 +65,11 @@ public class GameStateManager {
 	public static void RampDifficulty() { _instance._rampDifficulty(); }
 	public static void NewRock() { _instance._newRock(); }
 	public static void NewDistraction() { _instance._newDistraction(); }
-	public static void AddPoint() { _instance._score++; }
+	public static void AddPoint() {
+		if(_instance._gamestate != GameState.RUNNING)
+			return;
+		_instance._score++;
+	}
 	public static void OnResume() { _instance._onResume(); }
 	public static void OnPause() { _instance._onPause(); }
 	
