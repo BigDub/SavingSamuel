@@ -4,7 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
-import android.util.Log;
 
 public class GameStateManager {	
 	private static final Vector3 vCameraPosition = new Vector3(0, Wall.Top(), Wall.Top() / 2);
@@ -67,7 +66,6 @@ public class GameStateManager {
 	public static void SamuelHit() { gInstance.samuelHit(); }
 	public static void NewGame() { gInstance.newGame(); }
 	public static void GoToScores() {
-		Log.e("GameStateManager", "Difficulty: " + gInstance.iDifficulty);
 		gInstance.iGamestate = GameState.GAMEOVER;
     	Intent intent = new Intent(cContext, ScoresActivity.class);
     	intent.setAction("OPEN_SCORE_" + gInstance.iDifficulty);
