@@ -2,10 +2,10 @@ package com.example.savingsamuel;
 
 
 public class Rock extends Projectile{
-	private static Vector3Distribution _tints = new Vector3Distribution(0.97f, 0.04f, 0.97f, 0.02f, 0.97f, 0.02f);
-	private static FloatDistribution _shades = new FloatDistribution(0.3f, 0.1f);
-	private short _variation;
-	private static float _vertices[] = {
+	private static Vector3Distribution vTints = new Vector3Distribution(0.97f, 0.04f, 0.97f, 0.02f, 0.97f, 0.02f);
+	private static FloatDistribution fShades = new FloatDistribution(0.3f, 0.1f);
+	private short sVariation;
+	private static float fVertices[] = {
 	    -0.5f,  0.5f, 0.0f,	// top left
 		0f, 0f,
 	    -0.5f, -0.5f, 0.0f,	// bottom left
@@ -16,54 +16,54 @@ public class Rock extends Projectile{
 	 	1f, 0f
 	 	};
 
-    private static short _drawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
+    private static short sDrawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
     
-    private static Mesh[] _meshes;
+    private static Mesh[] mMeshes;
     
     public static void Load() {
     	Texture t0 = Texture.loadTexture("rock0"),
     			t1 = Texture.loadTexture("rock1");
-    	_meshes = new Mesh[] {
-    			new TexturedMesh(_vertices, _drawOrder, t0),
-    			new TexturedMesh(_vertices, _drawOrder, t1)
+    	mMeshes = new Mesh[] {
+    			new TexturedMesh(fVertices, sDrawOrder, t0),
+    			new TexturedMesh(fVertices, sDrawOrder, t1)
     	};
     }
     
 	private Rock() {
 		super();
-		_variation = (short)(Math.random() * 2f);
-		_tint = _tints.GetRandom();
-		if(_tint.x > 1)
-			_tint.x = 1;
-		if(_tint.y > 1)
-			_tint.y = 1;
-		if(_tint.z > 1)
-			_tint.z = 1;
-		if(_tint.x > _tint.y)
-			_tint.y = _tint.x;
-		if(_tint.x > _tint.z)
-			_tint.z = _tint.x;
-		float shade = _shades.GetRandom();
+		sVariation = (short)(Math.random() * 2f);
+		vTint = vTints.GetRandom();
+		if(vTint.x > 1)
+			vTint.x = 1;
+		if(vTint.y > 1)
+			vTint.y = 1;
+		if(vTint.z > 1)
+			vTint.z = 1;
+		if(vTint.x > vTint.y)
+			vTint.y = vTint.x;
+		if(vTint.x > vTint.z)
+			vTint.z = vTint.x;
+		float shade = fShades.GetRandom();
 		if(shade > 0) {
-			_tint.x -= shade;
-			_tint.y -= shade;
-			_tint.z -= shade;
+			vTint.x -= shade;
+			vTint.y -= shade;
+			vTint.z -= shade;
 		}
-		Projectile._projectiles.add(this);
+		Projectile.vProjectiles.add(this);
 	}
 	
 	public static void Launch(float rotation, float spin, Vector3 scale, Vector3 position, Vector3 velocity, boolean warn) {
 		Rock rock = new Rock();
-		rock._launch(rotation, spin, scale, position, velocity, warn);
+		rock.launch(rotation, spin, scale, position, velocity, warn);
 	}
 
 	@Override
 	protected Mesh mesh() {
-		return _meshes[_variation];
+		return mMeshes[sVariation];
 	}
 	
 	@Override
 	protected float collisionRadius() {
-		return _scale.x * 0.375f;
+		return vScale.x * 0.375f;
 	}
 }

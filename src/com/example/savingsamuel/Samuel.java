@@ -5,103 +5,103 @@ import android.opengl.Matrix;
 
 
 public class Samuel {
-	private static Samuel _instance;
+	private static Samuel sInstance;
 
 	private static float
-		_height,
-		_width,
-		_left,
-		_bottom = Wall.Top();
-    private static float _vertices[];
+		fHeight,
+		fWidth,
+		fLeft,
+		fBottom = Wall.Top();
+    private static float fVertices[];
 
-    private static final short _drawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
+    private static final short sDrawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
     
-    private static Mesh _mesh;
+    private static Mesh mMesh;
 
 	public static void Init() {
-		_instance = new Samuel();
+		sInstance = new Samuel();
 	}
-	public static Vector3 Position() { return _instance._position; }
-    public static float Left() { return _left; }
-    public static float Width() { return _width; }
-    public static float Height() { return _height; }
-    public static float Bottom() { return _bottom; }
+	public static Vector3 Position() { return sInstance.vPosition; }
+    public static float Left() { return fLeft; }
+    public static float Width() { return fWidth; }
+    public static float Height() { return fHeight; }
+    public static float Bottom() { return fBottom; }
     public static void Load() {
     	Texture texture = Texture.loadTexture("samuel");
     	
     	float scale = 4;
-        _height = scale;
-		_width = ((float)texture.Width() / (float)texture.Height()) * scale;
-		_left = -0.5f * _width;
-        _vertices = new float[] {
-        	    _left,  _height, 0.0f,	// top left
+        fHeight = scale;
+		fWidth = ((float)texture.Width() / (float)texture.Height()) * scale;
+		fLeft = -0.5f * fWidth;
+        fVertices = new float[] {
+        	    fLeft,  fHeight, 0.0f,	// top left
         		0f, 0f,
-        	    _left, 0f, 0.0f,	// bottom left
+        	    fLeft, 0f, 0.0f,	// bottom left
         	    0f, 1f,
-        	    _left + _width, 0f, 0.0f, 	// bottom right
+        	    fLeft + fWidth, 0f, 0.0f, 	// bottom right
         	    1f, 1f,
-        	 	_left + _width, _height, 0.0f,	// top right
+        	 	fLeft + fWidth, fHeight, 0.0f,	// top right
         	 	1f, 0f
         	 	};
         
-        _mesh = new TexturedMesh(_vertices, _drawOrder, texture);
+        mMesh = new TexturedMesh(fVertices, sDrawOrder, texture);
 
     }
     public static void Draw() {
-        _instance._draw();
+        sInstance.draw();
     }
     public static void Update(float elapsed) {
-    	_instance._update(elapsed);
+    	sInstance.update(elapsed);
     }
     public static void Reset() {
-    	_instance._reset();
+    	sInstance.reset();
     }
     public static void Knock(Vector3 incomingVelocity) {
-    	if(_instance._falling)
+    	if(sInstance.bFalling)
     		return;
-    	_instance._falling = true;
+    	sInstance.bFalling = true;
     	
 		AudioManager.playWilhelm();
-    	_instance._velocity = Vector3.Scale(incomingVelocity, 0.2f);
-    	_instance._velocity.y = 0;
+    	sInstance.vVelocity = Vector3.Scale(incomingVelocity, 0.2f);
+    	sInstance.vVelocity.y = 0;
     	GameStateManager.SamuelHit();
     }
     public static boolean Hit(Vector3 position, float radius) {
-    	return !_instance._falling &&
-		position.x + radius > _left &&
-		position.x - radius < _left + _width &&
-		position.y + radius > _bottom &&
-		position.y - radius < _bottom + _height;
+    	return !sInstance.bFalling &&
+		position.x + radius > fLeft &&
+		position.x - radius < fLeft + fWidth &&
+		position.y + radius > fBottom &&
+		position.y - radius < fBottom + fHeight;
     }
     
-    private Vector3 _position, _velocity;
-    private boolean _falling;
+    private Vector3 vPosition, vVelocity;
+    private boolean bFalling;
     
     private Samuel() {
-    	_reset();
+    	reset();
     }
     
-    private void _reset() {
-    	_falling = false;
-    	_velocity = new Vector3(0);
-    	_position = new Vector3(0, _bottom, 0);
+    private void reset() {
+    	bFalling = false;
+    	vVelocity = new Vector3(0);
+    	vPosition = new Vector3(0, fBottom, 0);
     }
     
-    private void _update(float elapsed) {
-    	if(!_falling)
+    private void update(float elapsed) {
+    	if(!bFalling)
     		return;
-    	_position.Add(Vector3.Scale(_velocity, elapsed));
-    	_velocity.y -= 9.8f * elapsed;
+    	vPosition.Add(Vector3.Scale(vVelocity, elapsed));
+    	vVelocity.y -= 9.8f * elapsed;
     }
     
-    private void _draw() {
+    private void draw() {
     	float[] mMVPMatrix = new float[16];
         float[] mWorldMatrix = new float[16];
         Matrix.setIdentityM(mWorldMatrix, 0);
-        Matrix.translateM(mWorldMatrix, 0, _position.x, _position.y, _position.z);
+        Matrix.translateM(mWorldMatrix, 0, vPosition.x, vPosition.y, vPosition.z);
         Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mWorldMatrix, 0);
         
         GLES20.glUseProgram(Shader.Textured().Program());
-    	_mesh.Draw(mMVPMatrix, Shader.Textured());
+    	mMesh.Draw(mMVPMatrix, Shader.Textured());
     }
 }

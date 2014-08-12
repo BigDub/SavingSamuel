@@ -1,48 +1,52 @@
 package com.example.savingsamuel;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
+import android.util.Log;
 
 public class GameStateManager {	
-	private static final Vector3 _cameraPosition = new Vector3(0, Wall.Top(), Wall.Top() / 2);
+	private static final Vector3 vCameraPosition = new Vector3(0, Wall.Top(), Wall.Top() / 2);
+	private static Context cContext;
 	private static final float 
-		_initialSafeTime = 2,
-		_lossWait = 5,
-		_difficultyRampTime = 1,
-		_difficultyRampLength = 60f / _difficultyRampTime,
+		fInitialSafeTime = 2,
+		fLossWait = 5,
+		fDifficultyRampTime = 1,
+		fDifficultyRampLength = 60f / fDifficultyRampTime,
 		
-		_rockDelayMeanInitial = 2,
-		_rockDelayMeanFinal = 0.8f,
-		_rockDelayMeanDecay = (_rockDelayMeanFinal - _rockDelayMeanInitial) / _difficultyRampLength,
+		fRockDelayMeanInitial = 2,
+		fRockDelayMeanFinal = 0.8f,
+		fRockDelayMeanDecay = (fRockDelayMeanFinal - fRockDelayMeanInitial) / fDifficultyRampLength,
 		
-		_rockDelayDeviationInitial = 0.25f,
-		_rockDelayDeviationFinal = 0.1f,
-		_rockDelayDeviationDecay = (_rockDelayDeviationFinal - _rockDelayDeviationInitial) / _difficultyRampLength;
-	private static GameStateManager _instance = new GameStateManager();
+		fRockDelayDeviationInitial = 0.25f,
+		fRockDelayDeviationFinal = 0.1f,
+		fRockDelayDeviationDecay = (fRockDelayDeviationFinal - fRockDelayDeviationInitial) / fDifficultyRampLength;
+	private static GameStateManager gInstance = new GameStateManager();
 	
-	public static GameStateManager Instance() { return _instance; }
-	public static Vector3 CameraPosition() { return _cameraPosition; }
+	public static GameStateManager Instance() { return gInstance; }
+	public static Vector3 CameraPosition() { return vCameraPosition; }
 	public static void updatePreferences(SharedPreferences sharedPref) {
 		AudioManager.updateMute(sharedPref.getBoolean("pref_mute", false));
-		_instance._difficulty = Integer.parseInt(sharedPref.getString("pref_dif", "1"));
-		_instance._warnEffect = sharedPref.getBoolean("pref_warn", true);
+		gInstance.iDifficulty = Integer.parseInt(sharedPref.getString("pref_dif", "1"));
+		gInstance.bWarnEffect = sharedPref.getBoolean("pref_warn", true);
 	}
 	public static void Init(Context context) {
+		cContext = context;
         Projectile.Init();
         AudioManager.Init(context);
 		Shader.Init(context);
 		Texture.Init(context);
 		Samuel.Init();
-		_instance._newGame();
+		gInstance.newGame();
 	}
 	public static boolean WarnEffect() {
-		if(_instance._gamestate == GameState.RUNNING)
-			return _instance._warnEffect;
+		if(gInstance.iGamestate == GameState.RUNNING)
+			return gInstance.bWarnEffect;
 		return false;
 	}
 	public static float TapScale() {
-		switch(_instance._difficulty) {
+		switch(gInstance.iDifficulty) {
 		case 0:
 			return 1;
 		case 1:
@@ -55,47 +59,54 @@ public class GameStateManager {
 			return 6;	
 		}
 	}
-	public static float Score() { return _instance._score; }
+	public static float Score() { return gInstance.iScore; }
 	public static void Update() {
-		if(_instance._hasFocus)
-			_instance._update();
+		if(gInstance.bHasFocus)
+			gInstance.update();
 	}
-	public static void SamuelHit() { _instance._samuelHit(); }
-	public static void NewGame() { _instance._newGame(); }
-	public static void RampDifficulty() { _instance._rampDifficulty(); }
-	public static void NewRock() { _instance._newRock(); }
-	public static void NewDistraction() { _instance._newDistraction(); }
+	public static void SamuelHit() { gInstance.samuelHit(); }
+	public static void NewGame() { gInstance.newGame(); }
+	public static void GoToScores() {
+		Log.e("GameStateManager", "Difficulty: " + gInstance.iDifficulty);
+		gInstance.iGamestate = GameState.GAMEOVER;
+    	Intent intent = new Intent(cContext, ScoresActivity.class);
+    	intent.setAction("OPEN_SCORE_" + gInstance.iDifficulty);
+    	cContext.startActivity(intent);
+	}
+	public static void RampDifficulty() { gInstance.rampDifficulty(); }
+	public static void NewRock() { gInstance.newRock(); }
+	public static void NewDistraction() { gInstance.newDistraction(); }
 	public static void AddPoint() {
-		if(_instance._gamestate != GameState.RUNNING)
+		if(gInstance.iGamestate != GameState.RUNNING)
 			return;
-		_instance._score++;
+		gInstance.iScore++;
 	}
-	public static void OnResume() { _instance._onResume(); }
-	public static void OnPause() { _instance._onPause(); }
+	public static void OnResume() { gInstance.onResume(); }
+	public static void OnPause() { gInstance.onPause(); }
 	
-	private long _uptime;
-	private int _gamestate, _difficulty, _score;
+	private long lUptime;
+	private int iGamestate, iDifficulty, iScore;
 	// Lower numbers means harder difficulty
-	private boolean _warnEffect, _hasFocus;
-	private FloatDistribution _rockFlightTime, _rockDelayTime, _distractionDelayTime;
-	private Vector3Distribution _crowdArea;
-	private float _crowdOffset = 12, _timescale = 1;
+	private boolean bWarnEffect, bHasFocus;
+	private FloatDistribution fRockFlightTime, fRockDelayTime, fDistractionDelayTime;
+	private Vector3Distribution vCrowdArea;
+	private float fCrowdOffset = 12, fTimescale = 1;
 	
 	public GameStateManager() {}
 	
 	private Vector3 launchOrigin() {
-		Vector3 origin = _crowdArea.GetRandom();
+		Vector3 origin = vCrowdArea.GetRandom();
 		if(Math.random() < 0.5f) {
-			origin.x -= _crowdOffset;
+			origin.x -= fCrowdOffset;
 		} else {
-			origin.x += _crowdOffset;
+			origin.x += fCrowdOffset;
 		}
 		return origin;
 	}
 	private void launchRock(Vector3 target, boolean warn) {
 		Vector3 position = launchOrigin();
 		Vector3 delta = Vector3.Subtract(target, position);
-		float flightTime = _rockFlightTime.GetRandom();
+		float flightTime = fRockFlightTime.GetRandom();
     	Rock.Launch(
     			(float)Math.random() * 360f,
     			(float)Math.random() * 720f - 360f,
@@ -108,79 +119,82 @@ public class GameStateManager {
     			warn
     			);
 	}
-	private void _update() {
+	private void update() {
         long nuptime = SystemClock.uptimeMillis();
-        float elapsed = ((float) (nuptime - _uptime) / 1000f) * _timescale;
-        _uptime = nuptime;
+        float elapsed = ((float) (nuptime - lUptime) / 1000f) * fTimescale;
+        lUptime = nuptime;
         
         Timer.Update(elapsed);
         
-		if(_gamestate == GameState.RUNNING) {
+		if(iGamestate == GameState.RUNNING) {
 	        Projectile.Update(elapsed);
-		} else if (_gamestate == GameState.LOSING) {
+		} else if (iGamestate == GameState.LOSING) {
 			Samuel.Update(elapsed);
 	        Projectile.Update(elapsed);
 		}
 	}
-	private void _newGame() {
+	private void newGame() {
 		Samuel.Reset();
 		Projectile.Reset();
-		_score = 0;
-		_timescale = 1;
-		_rockFlightTime = new FloatDistribution(3f, 0.1f);
-		_rockDelayTime = new FloatDistribution(_rockDelayMeanInitial, _rockDelayDeviationInitial);
-		_distractionDelayTime = new FloatDistribution(3, 0.5f);
-		_crowdArea = new Vector3Distribution(
+		iScore = 0;
+		fTimescale = 1;
+		fRockFlightTime = new FloatDistribution(3f, 0.1f);
+		fRockDelayTime = new FloatDistribution(fRockDelayMeanInitial, fRockDelayDeviationInitial);
+		fDistractionDelayTime = new FloatDistribution(3, 0.5f);
+		vCrowdArea = new Vector3Distribution(
 				0, 3,
 				0, 0,
 				5, 1
 				);
 		   
-    	new Timer(this, _rockDelayTime.GetRandom(), "NewRock", _initialSafeTime);
-    	new Timer(this, _distractionDelayTime.GetRandom(), "NewDistraction", _initialSafeTime);
-		new Timer(this, _difficultyRampTime, "RampDifficulty", _initialSafeTime, true);
+    	new Timer(this, fRockDelayTime.GetRandom(), "NewRock", fInitialSafeTime);
+    	new Timer(this, fDistractionDelayTime.GetRandom(), "NewDistraction", fInitialSafeTime);
+		new Timer(this, fDifficultyRampTime, "RampDifficulty", fInitialSafeTime, true);
 		
-		_uptime = SystemClock.uptimeMillis();
-		_gamestate = GameState.RUNNING;
+		lUptime = SystemClock.uptimeMillis();
+		iGamestate = GameState.RUNNING;
 	}
-	private void _samuelHit() {
-		if(_gamestate == GameState.RUNNING) {
-			_gamestate = GameState.LOSING;
+	private void samuelHit() {
+		if(iGamestate == GameState.RUNNING) {
+			iGamestate = GameState.LOSING;
 			Timer.Drop();
-			new Timer(this, _lossWait, "NewGame");
+			HighScoresManager.addScore(iDifficulty, iScore);
+			new Timer(this, fLossWait, "GoToScores");
 		}
 	}
-	private void _rampDifficulty() {
-		if(_rockDelayTime.Mean() > _rockDelayMeanFinal) {
-    		_rockDelayTime.ShiftMean(_rockDelayMeanDecay);
+	private void rampDifficulty() {
+		if(fRockDelayTime.Mean() > fRockDelayMeanFinal) {
+    		fRockDelayTime.ShiftMean(fRockDelayMeanDecay);
     	}
-    	if(_rockDelayTime.StandardDeviation() > _rockDelayDeviationFinal) {
-    		_rockDelayTime.ShiftStandardDeviation(_rockDelayDeviationDecay);
+    	if(fRockDelayTime.StandardDeviation() > fRockDelayDeviationFinal) {
+    		fRockDelayTime.ShiftStandardDeviation(fRockDelayDeviationDecay);
     	}
 	}
-	private void _newRock() {
+	private void newRock() {
 		launchRock(new Vector3(
 				Samuel.Left() + (float)(Math.random() * 0.5 + 0.5) * Samuel.Width(),
 				Samuel.Bottom() + (float)(Math.random() * 0.5 + 0.5) * Samuel.Height(),
 				0),
 				true
 		);   
-    	new Timer(this, _rockDelayTime.GetRandom(), "NewRock");
+    	new Timer(this, fRockDelayTime.GetRandom(), "NewRock");
 	}
-	private void _newDistraction() {
+	private void newDistraction() {
     	launchRock(new Vector3(
     					Samuel.Left() + (float)Math.random() * 6 * Samuel.Width() - 3 * Samuel.Width(),
     					Samuel.Bottom() - ((float)Math.random() + 1) * Samuel.Height(),
     					0),
     					false
     			);
-    	new Timer(this, _distractionDelayTime.GetRandom(), "NewDistraction");
+    	new Timer(this, fDistractionDelayTime.GetRandom(), "NewDistraction");
 	}
-	private void _onResume() {
-		_hasFocus = true;
-        _uptime = SystemClock.uptimeMillis();
+	private void onResume() {
+		bHasFocus = true;
+        lUptime = SystemClock.uptimeMillis();
+        if(iGamestate == GameState.GAMEOVER)
+        	newGame();
 	}
-	private void _onPause() {
-		_hasFocus = false;
+	private void onPause() {
+		bHasFocus = false;
 	}
 }

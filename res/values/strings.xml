@@ -1,28 +1,35 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+
     <string name="app_name">Saving Samuel</string>
     <string name="play_button">Play</string>
     <string name="settings">Settings</string>
-    
     <string name="pref_mute_title">Mute</string>
-	<string name="pref_mute_summary">Disables game sounds.</string>
-	
-	<string name="pref_warn_title">Warning Effect</string>
-	<string name="pref_warn_summary">Makes projectiles heading toward Samuel flash red.</string>
-	
-	<string name="pref_dif_title">Tapping Difficulty</string>
-	<string name="pref_dif_summary">Defines how easy it is to tap a target.</string>
-	<string name="pref_dif_dialog">Tapping Difficulty</string>
-	<string-array name="pref_dif_labels">
-	    <item>Exact</item>
-	    <item>Hard</item>
-	    <item>Easy</item>
-	    <item>I have a tiny screen</item>
-	</string-array>
-	<string-array name="pref_dif_values">
-	    <item>0</item>
-	    <item>1</item>
-	    <item>2</item>
-	    <item>3</item>
-	</string-array>
+    <string name="pref_mute_summary">Disables game sounds.</string>
+    <string name="pref_warn_title">Warning Effect</string>
+    <string name="pref_warn_summary">Makes projectiles heading toward Samuel flash red.</string>
+    <string name="pref_dif_title">Tapping Difficulty</string>
+    <string name="pref_dif_summary">Defines how easy it is to tap a target.</string>
+    <string name="pref_dif_dialog">Tapping Difficulty</string>
+
+    <string-array name="pref_dif_labels">
+        <item>Exact</item>
+        <item>Hard</item>
+        <item>Easy</item>
+    </string-array>
+    <string-array name="pref_dif_values">
+        <item>0</item>
+        <item>1</item>
+        <item>2</item>
+    </string-array>
+
+    <string name="scores">Highscores</string>
+    
+    <string name="action_settings">Settings</string>
+    
+    <string name="title_activity_scores">Highscores</string>
+    <string name="score_section0">Exact Highscores</string>
+    <string name="score_section1">Hard Highscores</string>
+    <string name="score_section2">Easy Highscores</string>
+
 </resources>

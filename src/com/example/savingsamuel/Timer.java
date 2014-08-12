@@ -6,97 +6,97 @@ import java.util.Vector;
 
 public class Timer {
 	private static Vector<Timer>
-		_newTimers = new Vector<Timer>(1),
-		_activeTimers = new Vector<Timer>(),
-		_expiredTimers = new Vector<Timer>(1);
+		vNewTimers = new Vector<Timer>(1),
+		vActiveTimers = new Vector<Timer>(),
+		vExpiredTimers = new Vector<Timer>(1);
 	
-	private static void _register(Timer t) {
-		_newTimers.add(t);
+	private static void register(Timer t) {
+		vNewTimers.add(t);
 	}
-	private static void _unregister(Timer t) {
-		_expiredTimers.add(t);
+	private static void unregister(Timer t) {
+		vExpiredTimers.add(t);
 	}
 	
 	public static void Update(float elapsed) {
-		if(!_newTimers.isEmpty()) {
-			for(Timer t : _newTimers) {
-				_activeTimers.add(t);
+		if(!vNewTimers.isEmpty()) {
+			for(Timer t : vNewTimers) {
+				vActiveTimers.add(t);
 			}
-			_newTimers.clear();
+			vNewTimers.clear();
 		}
 		
-		for(Timer t : _activeTimers) {
-			t._update(elapsed);
+		for(Timer t : vActiveTimers) {
+			t.update(elapsed);
 		}
 		
-		if(!_expiredTimers.isEmpty()) {
-			for(Timer t : _expiredTimers) {
-				_activeTimers.remove(t);
+		if(!vExpiredTimers.isEmpty()) {
+			for(Timer t : vExpiredTimers) {
+				vActiveTimers.remove(t);
 			}
-			_expiredTimers.clear();
+			vExpiredTimers.clear();
 		}
 	}
 	public static void Drop() {
-		_activeTimers.clear();
-		_expiredTimers.clear();
+		vActiveTimers.clear();
+		vExpiredTimers.clear();
 	}
 	
-	private Object _caller;
-	private float _trigger, _timer;
-	private Method _action;
-	private boolean _looping;
+	private Object oCaller;
+	private float fTrigger, fTimer;
+	private Method mAction;
+	private boolean bLooping;
 	
 	public Timer(Object caller, float trigger, String methodName) {
-		_caller = caller;
+		oCaller = caller;
 		try {
-			_action = _caller.getClass().getMethod(methodName, (Class<?>[])null);
+			mAction = oCaller.getClass().getMethod(methodName, (Class<?>[])null);
 		} catch (NoSuchMethodException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
-		_trigger = trigger;
-		_timer = _trigger;
-		_looping = false;
-		_register(this);
+		fTrigger = trigger;
+		fTimer = fTrigger;
+		bLooping = false;
+		register(this);
 	}
 	
 	public Timer(Object caller, float trigger, String methodName, float offset) {
-		_caller = caller;
+		oCaller = caller;
 		try {
-			_action = _caller.getClass().getMethod(methodName, (Class<?>[])null);
+			mAction = oCaller.getClass().getMethod(methodName, (Class<?>[])null);
 		} catch (NoSuchMethodException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
-		_trigger = trigger;
-		_timer = _trigger + offset;
-		_looping = false;
-		_register(this);
+		fTrigger = trigger;
+		fTimer = fTrigger + offset;
+		bLooping = false;
+		register(this);
 	}
 	
 	public Timer(Object caller, float trigger, String methodName, float offset, boolean loop) {
-		_caller = caller;
+		oCaller = caller;
 		try {
-			_action = _caller.getClass().getMethod(methodName, (Class<?>[])null);
+			mAction = oCaller.getClass().getMethod(methodName, (Class<?>[])null);
 		} catch (NoSuchMethodException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return;
 		}
-		_trigger = trigger;
-		_timer = _trigger + offset;
-		_looping = loop;
-		_register(this);
+		fTrigger = trigger;
+		fTimer = fTrigger + offset;
+		bLooping = loop;
+		register(this);
 	}
 	
-	private void _update(float elapsed) {
-		_timer -= elapsed;
-		if(_timer > 0) 
+	private void update(float elapsed) {
+		fTimer -= elapsed;
+		if(fTimer > 0) 
 			return;
 		try {
-			_action.invoke(_caller);
+			mAction.invoke(oCaller);
 		} catch (IllegalAccessException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -107,10 +107,10 @@ public class Timer {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		if(_looping) {
-			_timer += _trigger;
+		if(bLooping) {
+			fTimer += fTrigger;
 		} else {
-			_unregister(this);
+			unregister(this);
 		}
 	}
 }

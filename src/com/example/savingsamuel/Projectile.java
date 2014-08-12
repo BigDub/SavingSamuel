@@ -8,189 +8,189 @@ import android.opengl.Matrix;
 
 
 public abstract class Projectile {
-	private static float _effectTimer = 0, _warnPercent;
-	private static int _pendingKnock = 0;
-	private static float _knockX, _knockY;
-	private static Vector3 _warningTint = new Vector3(1, 0.5f, 0.5f);
+	private static float fEffectTimer = 0, fWarnPercent;
+	private static int iPendingKnock = 0;
+	private static float fKnockX, fKnockY;
+	private static Vector3 vWarningTint = new Vector3(1, 0.5f, 0.5f);
 	
-	protected static Vector<Projectile> _projectiles, _preList, _postList;
+	protected static Vector<Projectile> vProjectiles, vPreList, vPostList;
 	
 	public static void Init() {
-		_projectiles = new Vector<Projectile>();
-		_preList = new Vector<Projectile>();
-		_postList = new Vector<Projectile>();
+		vProjectiles = new Vector<Projectile>();
+		vPreList = new Vector<Projectile>();
+		vPostList = new Vector<Projectile>();
 	}
 	public static void Update(float elapsed) {
 		boolean hit = false;
 		// Prevents asynchronous iteration of the projectile list which can cause fatal errors.
-		if(_pendingKnock == 1)
-			_pendingKnock = 2;
-		for(Projectile p : _projectiles) {
-			if(p._active) {
-				if(_pendingKnock > 0) {
-					float dx = _knockX - p._screenX;
-					float dy = _knockY - p._screenY;
+		if(iPendingKnock == 1)
+			iPendingKnock = 2;
+		for(Projectile p : vProjectiles) {
+			if(p.bActive) {
+				if(iPendingKnock > 0) {
+					float dx = fKnockX - p.fScreenX;
+					float dy = fKnockY - p.fScreenY;
 					float diff = (float)Math.sqrt(Math.pow(dx, 2) + Math.pow(dy, 2));
-					if(diff <= p._screenRad * GameStateManager.TapScale()) {
+					if(diff <= p.fScreenRad * GameStateManager.TapScale()) {
 						hit = true;
-						if(!p._tapped) {
+						if(!p.bTapped) {
 							GameStateManager.AddPoint();
-							p._tapped = true;
+							p.bTapped = true;
 						}
 						
-						Vector3 push = Vector3.Subtract(p._position, GameStateManager.CameraPosition());
+						Vector3 push = Vector3.Subtract(p.vPosition, GameStateManager.CameraPosition());
 						//push.y = 0;
-						p._spin *= 0.75f;
-						p._velocity.Scale(0.9f).Add(push.Normalize().Scale(6));
-						p._updateEffects();
+						p.fSpin *= 0.75f;
+						p.vVelocity.Scale(0.9f).Add(push.Normalize().Scale(6));
+						p.updateEffects();
 					}
 				}
-				p._update(elapsed);
+				p.update(elapsed);
 			}
 		}
 		if(hit)
 			AudioManager.playSlap();
-		_pendingKnock = 0;
-        _effectTimer += elapsed;
+		iPendingKnock = 0;
+        fEffectTimer += elapsed;
         
-        if(_effectTimer >= Math.PI * 2)
-        	_effectTimer -= Math.PI * 2;
+        if(fEffectTimer >= Math.PI * 2)
+        	fEffectTimer -= Math.PI * 2;
 	}
 	public static void Knock(float x, float y) {
-		if(_pendingKnock != 2) {
-			_pendingKnock = 1;
-			_knockX = x;
-			_knockY = y;
+		if(iPendingKnock != 2) {
+			iPendingKnock = 1;
+			fKnockX = x;
+			fKnockY = y;
 		}
 	}	
 	public static void DrawPre() {
     	Vector<Projectile> removeList = new Vector<Projectile>(1);
-    	for(Projectile p : _projectiles) {
-    		if(p._active) {
-    			if(p._position.z < 0) {
-    				_preList.add(p);
+    	for(Projectile p : vProjectiles) {
+    		if(p.bActive) {
+    			if(p.vPosition.z < 0) {
+    				vPreList.add(p);
     			} else {
-    				_postList.add(p);
+    				vPostList.add(p);
     			}
     		} else {
     			removeList.add(p);
     		}
     	}
     	for(Projectile p : removeList)
-    		_projectiles.remove(p);
-    	Collections.sort(_preList, ProjectileComparator.Instance());
-    	Collections.sort(_postList, ProjectileComparator.Instance());
+    		vProjectiles.remove(p);
+    	Collections.sort(vPreList, ProjectileComparator.Instance());
+    	Collections.sort(vPostList, ProjectileComparator.Instance());
     	
     	if(GameStateManager.WarnEffect()) {
-    		_warnPercent = (float)(Math.cos(_effectTimer * Math.PI * 4) / 2d + 0.5d);
+    		fWarnPercent = (float)(Math.cos(fEffectTimer * Math.PI * 4) / 2d + 0.5d);
     	} else {
-    		_warnPercent = 0;
+    		fWarnPercent = 0;
     	}
         
     	
-    	for(Projectile p : _preList) {
-    		p._draw();
+    	for(Projectile p : vPreList) {
+    		p.draw();
     	}
     }
     public static void DrawShadow() {
-    	for(Projectile p : _postList) {
-    		p._drawShadow();
+    	for(Projectile p : vPostList) {
+    		p.drawShadow();
     	}
     }
     public static void DrawPost() {
-    	for(Projectile p : _postList) {
-    		p._draw();
+    	for(Projectile p : vPostList) {
+    		p.draw();
     	}
-    	_preList.clear();
-    	_postList.clear();
+    	vPreList.clear();
+    	vPostList.clear();
     }
     public static void Reset() {
     	Init();
     }
     
-    private boolean _active, _warnOn, _tapped;
+    private boolean bActive, bWarnOn, bTapped;
     
-    protected float _rotation, _spin, _screenX, _screenY, _screenRad;
-    protected Vector3 _scale, _position, _velocity, _tint;
+    protected float fRotation, fSpin, fScreenX, fScreenY, fScreenRad;
+    protected Vector3 vScale, vPosition, vVelocity, vTint;
     
     public Projectile() {
-    	_active = false;
-    	_warnOn = false;
-    	_tapped = false;
-    	_position = new Vector3();
-    	_velocity = new Vector3();
+    	bActive = false;
+    	bWarnOn = false;
+    	bTapped = false;
+    	vPosition = new Vector3();
+    	vVelocity = new Vector3();
     }
 
-    private void _update(float elapsed) {
-    	if (_position.y <= 0 && _velocity.y <= 0) {
-    		_active = false;
+    private void update(float elapsed) {
+    	if (vPosition.y <= 0 && vVelocity.y <= 0) {
+    		bActive = false;
     		return;
     	}
     	float colrad = collisionRadius();
-    	if (_position.z > 0 && _velocity.z < 0 && _position.z - colrad + _velocity.z * elapsed <= 0) {
+    	if (vPosition.z > 0 && vVelocity.z < 0 && vPosition.z - colrad + vVelocity.z * elapsed <= 0) {
     		float wall = Wall.Top();
-    		if(Samuel.Hit(_position, colrad)) {
-    			Samuel.Knock(_velocity);
+    		if(Samuel.Hit(vPosition, colrad)) {
+    			Samuel.Knock(vVelocity);
 	    		AudioManager.playImpact();
-    			_velocity = Vector3.Bounce(_velocity,
-    					Vector3.Subtract(_position,
+    			vVelocity = Vector3.Bounce(vVelocity,
+    					Vector3.Subtract(vPosition,
     							new Vector3(
     									Samuel.Left() + 0.5f * Samuel.Width(),
     									Samuel.Bottom() + 0.5f * Samuel.Height(),
     									0
     									)).Normal()).Scale(0.2f);
-	    		_spin /= -1.5f;
-	    		_warnOn = false;
+	    		fSpin /= -1.5f;
+	    		bWarnOn = false;
     		}
-    		if(_position.y <= wall) {
+    		if(vPosition.y <= wall) {
 	    		//Impact with wall
 	    		AudioManager.playImpact();
-	    		_position.z = colrad;
-	    		_velocity = Vector3.Bounce(_velocity, Vector3.UnitZ()).Scale(0.2f);
-	    		_spin /= -2f;
-	    		_warnOn = false;
-    		} else if(_position.y - colrad <= wall) {
+	    		vPosition.z = colrad;
+	    		vVelocity = Vector3.Bounce(vVelocity, Vector3.UnitZ()).Scale(0.2f);
+	    		fSpin /= -2f;
+	    		bWarnOn = false;
+    		} else if(vPosition.y - colrad <= wall) {
     			//Impact with top of the wall
     			Vector3 normal = new Vector3(
     					0,
-    					_position.y - wall,
-    					_position.z
+    					vPosition.y - wall,
+    					vPosition.z
     					).Normalize();
 	    		AudioManager.playImpact();
-	    		_position = Vector3.Scale(normal, colrad).Add(new Vector3(_position.x, wall, 0));
-	    		_velocity = Vector3.Bounce(_velocity, Vector3.UnitZ()).Scale(0.2f);
-	    		_spin /= -2f;
-	    		_updateEffects();
+	    		vPosition = Vector3.Scale(normal, colrad).Add(new Vector3(vPosition.x, wall, 0));
+	    		vVelocity = Vector3.Bounce(vVelocity, Vector3.UnitZ()).Scale(0.2f);
+	    		fSpin /= -2f;
+	    		updateEffects();
     		}
     	}
-		_position.Add(Vector3.Scale(_velocity, elapsed));
-    	_velocity.y -= 9.8f * elapsed;
-    	_rotation += _spin * elapsed;
+		vPosition.Add(Vector3.Scale(vVelocity, elapsed));
+    	vVelocity.y -= 9.8f * elapsed;
+    	fRotation += fSpin * elapsed;
         
-        float[] test = new float[] { _position.x, _position.y, _position.z, 1 };
+        float[] test = new float[] { vPosition.x, vPosition.y, vPosition.z, 1 };
         float[] output = new float[4];
         Matrix.multiplyMV(output, 0, MyRenderer.mVPMatrix(), 0, test, 0);
-        _screenX = ((output[0] / output[3]) + 1f) / 2f * MyRenderer.Width();
-        _screenY = ((-output[1] / output[3]) + 1f) / 2f * MyRenderer.Height();
+        fScreenX = ((output[0] / output[3]) + 1f) / 2f * MyRenderer.Width();
+        fScreenY = ((-output[1] / output[3]) + 1f) / 2f * MyRenderer.Height();
         
-        test = new float[] { _position.x + colrad, _position.y, _position.z, 1 };
+        test = new float[] { vPosition.x + colrad, vPosition.y, vPosition.z, 1 };
         Matrix.multiplyMV(output, 0, MyRenderer.mVPMatrix(), 0, test, 0);
-        _screenRad = (((output[0] / output[3]) + 1f) / 2f * MyRenderer.Width()) - _screenX;
+        fScreenRad = (((output[0] / output[3]) + 1f) / 2f * MyRenderer.Width()) - fScreenX;
     }   
-    private void _updateEffects() {
+    private void updateEffects() {
     	if(GameStateManager.WarnEffect()) {
-    		_warnOn = _onTarget();
+    		bWarnOn = onTarget();
     	} else {
-    		_warnOn = false;
+    		bWarnOn = false;
     	}
     }
-    private boolean _onTarget() {
-    	if(_velocity.z >= 0 || _position.z < 0)
+    private boolean onTarget() {
+    	if(vVelocity.z >= 0 || vPosition.z < 0)
     		return false;
     	float colRad = collisionRadius(),
-    			flightTime = _position.z / -_velocity.z,
-    			projectedX = _position.x + _velocity.x * flightTime,
-    			projectedY = _position.y + _velocity.y * flightTime + (-9.8f / 2f) * flightTime * flightTime;
+    			flightTime = vPosition.z / -vVelocity.z,
+    			projectedX = vPosition.x + vVelocity.x * flightTime,
+    			projectedY = vPosition.y + vVelocity.y * flightTime + (-9.8f / 2f) * flightTime * flightTime;
     	
     	return (
     			projectedX + colRad >= Samuel.Left() &&
@@ -199,35 +199,35 @@ public abstract class Projectile {
     			projectedY - colRad <= Samuel.Bottom() + Samuel.Height()
     			);
     }
-    private Vector3 _getTint() {
-    	if(!_warnOn)
-    		return _tint;
-    	return Vector3.Add(Vector3.Scale(_warningTint, _warnPercent), Vector3.Scale(_tint, 1 - _warnPercent));
+    private Vector3 getTint() {
+    	if(!bWarnOn)
+    		return vTint;
+    	return Vector3.Add(Vector3.Scale(vWarningTint, fWarnPercent), Vector3.Scale(vTint, 1 - fWarnPercent));
     }
-    private void _draw() {
+    private void draw() {
     	float[] mMVPMatrix = new float[16];
         float[] mWorldMatrix = new float[16];
         Matrix.setIdentityM(mWorldMatrix, 0);
-        Matrix.translateM(mWorldMatrix, 0, _position.x, _position.y, _position.z);
-        Matrix.rotateM(mWorldMatrix, 0, _rotation, 0f, 0f, 1f);
-        Matrix.scaleM(mWorldMatrix, 0, _scale.x, _scale.y, _scale.z);
+        Matrix.translateM(mWorldMatrix, 0, vPosition.x, vPosition.y, vPosition.z);
+        Matrix.rotateM(mWorldMatrix, 0, fRotation, 0f, 0f, 1f);
+        Matrix.scaleM(mWorldMatrix, 0, vScale.x, vScale.y, vScale.z);
         Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mWorldMatrix, 0);
     	
-        Vector3 tint = _getTint();
+        Vector3 tint = getTint();
         GLES20.glUseProgram(Shader.TintedTexture().Program());
         GLES20.glUniform4f(
         		Shader.TintedTexture().getUniform("uTint"),
         		tint.x, tint.y, tint.z, 1f);
     	mesh().Draw(mMVPMatrix, Shader.TintedTexture());
     }    
-    private void _drawShadow() {
+    private void drawShadow() {
     	float[] mMVPMatrix = new float[16];
         float[] mWorldMatrix = new float[16];
-        float offset = 1.4142135623f * _scale.y;
+        float offset = 1.4142135623f * vScale.y;
         Matrix.setIdentityM(mWorldMatrix, 0);
-        Matrix.translateM(mWorldMatrix, 0, _position.x, _position.y - _position.z, 0f);
-        Matrix.scaleM(mWorldMatrix, 0, _scale.x, offset, _scale.z);
-        Matrix.rotateM(mWorldMatrix, 0, _rotation, 0f, 0f, 1f);
+        Matrix.translateM(mWorldMatrix, 0, vPosition.x, vPosition.y - vPosition.z, 0f);
+        Matrix.scaleM(mWorldMatrix, 0, vScale.x, offset, vScale.z);
+        Matrix.rotateM(mWorldMatrix, 0, fRotation, 0f, 0f, 1f);
         Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mWorldMatrix, 0);
 
         GLES20.glUseProgram(Shader.Shadow().Program());
@@ -239,18 +239,18 @@ public abstract class Projectile {
     
     protected abstract Mesh mesh();
     protected abstract float collisionRadius();
-    protected void _launch(float rotation, float spin, Vector3 scale, Vector3 position, Vector3 velocity, boolean warn) {
-    	_active = true;
-    	_rotation = rotation;
-    	_spin = spin;
-    	_scale = scale;
-    	_position = position;
-    	_velocity = velocity;
+    protected void launch(float rotation, float spin, Vector3 scale, Vector3 position, Vector3 velocity, boolean warn) {
+    	bActive = true;
+    	fRotation = rotation;
+    	fSpin = spin;
+    	vScale = scale;
+    	vPosition = position;
+    	vVelocity = velocity;
     	
     	if(GameStateManager.WarnEffect()) {
-    		_warnOn = warn;
+    		bWarnOn = warn;
     	} else {
-    		_warnOn = false;
+    		bWarnOn = false;
     	}
     }
 }

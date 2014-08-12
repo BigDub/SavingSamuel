@@ -8,23 +8,23 @@ import android.opengl.GLSurfaceView;
 import android.opengl.Matrix;
 
 public class MyRenderer implements GLSurfaceView.Renderer {
-	private static int _width, _height;
+	private static int iWidth, iHeight;
 	public static int Width() {
-		return _width;
+		return iWidth;
 	}
 	public static int Height() {
-		return _height;
+		return iHeight;
 	}
-	private static float[] _mProjectionMatrix = new float[16], 
-			_mViewMatrix = new float[16], 
-			_mVPMatrix = new float[16],
-			_mOrthoMatrix = new float[16];
+	private static float[] mProjectionMatrix = new float[16], 
+			mViewMatrix = new float[16], 
+			mVPMatrix = new float[16],
+			mOrthoMatrix = new float[16];
 	
 	public static float[] mVPMatrix() {
-		return _mVPMatrix;
+		return mVPMatrix;
 	}
 	public static float[] mOrthoMatrix() {
-		return _mOrthoMatrix;
+		return mOrthoMatrix;
 	}
 
 	@Override
@@ -38,7 +38,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		GLES20.glBlendFunc(GLES20.GL_SRC_ALPHA, GLES20.GL_ONE_MINUS_SRC_ALPHA);
 		GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         GLES20.glStencilOp(GLES20.GL_KEEP, GLES20.GL_KEEP, GLES20.GL_REPLACE);
-        Matrix.setLookAtM(_mViewMatrix, 0, 
+        Matrix.setLookAtM(mViewMatrix, 0, 
         		GameStateManager.CameraPosition().x,
         		GameStateManager.CameraPosition().y,
         		GameStateManager.CameraPosition().z,
@@ -83,15 +83,15 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 
 	@Override
 	public void onSurfaceChanged(GL10 gl, int width, int height) {
-		_width = width;
-		_height = height;
+		iWidth = width;
+		iHeight = height;
         GLES20.glViewport(0, 0, width, height);
 
         float aspectRatio = (float) width / height;
         
-        Matrix.orthoM(_mOrthoMatrix, 0, 0, width, 0, height, -1, 1);
-        Matrix.frustumM(_mProjectionMatrix, 0, -aspectRatio, aspectRatio, -1, 1, 1, 50);
-        Matrix.multiplyMM(_mVPMatrix, 0, _mProjectionMatrix, 0, _mViewMatrix, 0);
+        Matrix.orthoM(mOrthoMatrix, 0, 0, width, 0, height, -1, 1);
+        Matrix.frustumM(mProjectionMatrix, 0, -aspectRatio, aspectRatio, -1, 1, 1, 50);
+        Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
         Wall.setAspectRatio(aspectRatio);
 	}
 }

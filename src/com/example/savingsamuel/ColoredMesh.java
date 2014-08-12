@@ -10,21 +10,21 @@ import android.opengl.GLES20;
 public class ColoredMesh extends Mesh {
 	private static int BYTES_PER_VERTEX = 4 * (3 + 4);
 
-	protected final FloatBuffer vertexBuffer;
-	protected final ShortBuffer indexBuffer;
+	protected final FloatBuffer fbVertexBuffer;
+	protected final ShortBuffer sbIndexBuffer;
 	protected int iTexture;
 	
 	public ColoredMesh(float[] vertices, short[] indices) {
 		ByteBuffer vb = ByteBuffer.allocateDirect(4 * vertices.length);
 		vb.order(ByteOrder.nativeOrder());
-		vertexBuffer = vb.asFloatBuffer();
-		vertexBuffer.put(vertices);
+		fbVertexBuffer = vb.asFloatBuffer();
+		fbVertexBuffer.put(vertices);
 		
 		ByteBuffer ib = ByteBuffer.allocateDirect(2 * indices.length);
 		ib.order(ByteOrder.nativeOrder());
-		indexBuffer = ib.asShortBuffer();
-		indexBuffer.put(indices);
-		indexBuffer.position(0);
+		sbIndexBuffer = ib.asShortBuffer();
+		sbIndexBuffer.put(indices);
+		sbIndexBuffer.position(0);
 	}
 
 	@Override
@@ -39,21 +39,21 @@ public class ColoredMesh extends Mesh {
         // Enable a handle to the triangle vertices
         GLES20.glEnableVertexAttribArray(mPositionHandle);
 
-		vertexBuffer.position(0);
+		fbVertexBuffer.position(0);
         // Prepare the triangle coordinate data
         GLES20.glVertexAttribPointer(mPositionHandle, 3,
                                      GLES20.GL_FLOAT, false,
-                                     BYTES_PER_VERTEX, vertexBuffer);
+                                     BYTES_PER_VERTEX, fbVertexBuffer);
 
         // get handle to fragment shader's vColor member
         int mUVHandle = mProgram.getVertexAttribute("vColor");
 
         GLES20.glEnableVertexAttribArray(mUVHandle);
 
-		vertexBuffer.position(3);
+		fbVertexBuffer.position(3);
         GLES20.glVertexAttribPointer(mUVHandle, 4,
         		GLES20.GL_FLOAT, false,
-        		BYTES_PER_VERTEX, vertexBuffer);
+        		BYTES_PER_VERTEX, fbVertexBuffer);
 
         // get handle to shape's transformation matrix
         int mMVPMatrixHandle = mProgram.getUniform("uMVPMatrix");
@@ -64,8 +64,8 @@ public class ColoredMesh extends Mesh {
         
         // Draw the square
         GLES20.glDrawElements(
-                GLES20.GL_TRIANGLES, indexBuffer.capacity(),
-                GLES20.GL_UNSIGNED_SHORT, indexBuffer);
+                GLES20.GL_TRIANGLES, sbIndexBuffer.capacity(),
+                GLES20.GL_UNSIGNED_SHORT, sbIndexBuffer);
 
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);

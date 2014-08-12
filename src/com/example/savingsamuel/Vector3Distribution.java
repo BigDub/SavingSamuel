@@ -1,28 +1,28 @@
 package com.example.savingsamuel;
 
 public class Vector3Distribution {
-	private FloatDistribution _fdx, _fdy, _fdz;
+	private FloatDistribution fdx, fdy, fdz;
 	
 	public Vector3Distribution(FloatDistribution x, FloatDistribution y, FloatDistribution z) {
-		_fdx = x;
-		_fdy = y;
-		_fdz = z;
+		fdx = x;
+		fdy = y;
+		fdz = z;
 	}
 	public Vector3Distribution(
 				float x_mean, float x_stdDeviation,
 				float y_mean, float y_stdDeviation,
 				float z_mean, float z_stdDeviation
 				) {
-		_fdx = new FloatDistribution(x_mean, x_stdDeviation);
-		_fdy = new FloatDistribution(y_mean, y_stdDeviation);
-		_fdz = new FloatDistribution(z_mean, z_stdDeviation);
+		fdx = new FloatDistribution(x_mean, x_stdDeviation);
+		fdy = new FloatDistribution(y_mean, y_stdDeviation);
+		fdz = new FloatDistribution(z_mean, z_stdDeviation);
 	}
 	
 	public Vector3 GetRandom() {
 		return new Vector3(
-				_fdx.GetRandom(),
-				_fdy.GetRandom(),
-				_fdz.GetRandom()
+				fdx.GetRandom(),
+				fdy.GetRandom(),
+				fdz.GetRandom()
 				);
 	}
 }

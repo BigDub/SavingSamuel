@@ -7,34 +7,34 @@ import android.content.Context;
 import android.opengl.GLES20;
 
 public class Shader {
-	private static Context _context;
+	private static Context cContext;
 	private static Shader 
-		_uniformColor,
-		_varyingColor,
-		_textured,
-		_shadow,
-		_tinted,
-		_numbers;
+		sUniformColor,
+		sVaryingColor,
+		sTextured,
+		sShadow,
+		sTinted,
+		sNumbers;
 
 	
 	public static void Init(Context context) {
-		_context = context;
-		_uniformColor = new Shader(
+		cContext = context;
+		sUniformColor = new Shader(
 				R.string.vertexShaderAttributeP,
 				R.string.fragmentShaderUniformC);
-		_varyingColor = new Shader(
+		sVaryingColor = new Shader(
 				R.string.vertexShaderAttributePC,
 				R.string.fragmentShaderVaryingC);
-		_textured = new Shader(
+		sTextured = new Shader(
 				R.string.vertexShaderTextured,
 				R.string.fragmentShaderTextured);
-		_shadow = new Shader(
+		sShadow = new Shader(
 				R.string.vertexShaderTextured,
 				R.string.fragmentShaderShadow);
-		_tinted = new Shader(
+		sTinted = new Shader(
 				R.string.vertexShaderTextured,
 				R.string.fragmentShaderTinted);
-		_numbers = new Shader(
+		sNumbers = new Shader(
 				R.string.vertexShaderNumbers,
 				R.string.fragmentShaderTextured);
 	}
@@ -50,40 +50,40 @@ public class Shader {
 
 	    return shader;
 	}
-	public static Shader UniformColor() { return _uniformColor;	}
-	public static Shader VaryingColor() { return _varyingColor;	}
-	public static Shader Textured() { return _textured; }
-	public static Shader Shadow() { return _shadow;	}
-	public static Shader TintedTexture() { return _tinted; }
-	public static Shader Numbers() { return _numbers; }
+	public static Shader UniformColor() { return sUniformColor;	}
+	public static Shader VaryingColor() { return sVaryingColor;	}
+	public static Shader Textured() { return sTextured; }
+	public static Shader Shadow() { return sShadow;	}
+	public static Shader TintedTexture() { return sTinted; }
+	public static Shader Numbers() { return sNumbers; }
 	
 	private int hProgram = 0, hVertexShader = 0, hFragmentShader = 0;
 	private String vertexShaderCode, fragmentShaderCode;
-	private Map<String, Integer> _handles;
+	private Map<String, Integer> mHandles;
 	
 	public Shader(int vsc, int fsc) {
-		this.vertexShaderCode = _context.getString(vsc);
-		this.fragmentShaderCode = _context.getString(fsc);
-		_handles = new HashMap<String, Integer>();
+		this.vertexShaderCode = cContext.getString(vsc);
+		this.fragmentShaderCode = cContext.getString(fsc);
+		mHandles = new HashMap<String, Integer>();
 	}
 	
 	public int getUniform(String name) {
-		if(_handles.containsKey(name)) {
-			return _handles.get(name);
+		if(mHandles.containsKey(name)) {
+			return mHandles.get(name);
 		}
 		
 		int handle = GLES20.glGetUniformLocation(Program(), name);
-		_handles.put(name, handle);
+		mHandles.put(name, handle);
 		return handle;
 	}
 	
 	public int getVertexAttribute(String name) {
-		if(_handles.containsKey(name)) {
-			return _handles.get(name);
+		if(mHandles.containsKey(name)) {
+			return mHandles.get(name);
 		}
 		
 		int handle = GLES20.glGetAttribLocation(Program(), name);
-		_handles.put(name, handle);
+		mHandles.put(name, handle);
 		return handle;
 	}
 	

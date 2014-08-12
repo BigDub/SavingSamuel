@@ -6,55 +6,55 @@ import android.content.Context;
 import android.media.MediaPlayer;
 
 public class AudioManager {
-	private static Context _context;
-	private static AudioManager _instance;
-	private static boolean _mute = false;
+	private static Context cContext;
+	private static AudioManager aInstance;
+	private static boolean bMute = false;
 	
 	public static void updateMute(boolean mute) {
-		_mute = mute;
+		bMute = mute;
 	}
 
 	public static void Init(Context context) {
-		_context = context;
-		_instance = new AudioManager();
+		cContext = context;
+		aInstance = new AudioManager();
 	}
 	
-	private MediaPlayer[] _mediaPlayers;
+	private MediaPlayer[] mMediaPlayers;
 	
 	public AudioManager() {
-		_mediaPlayers = new MediaPlayer[7];
-		_mediaPlayers[0] = MediaPlayer.create(_context, R.raw.wilhelm);
-		_mediaPlayers[1] = MediaPlayer.create(_context, R.raw.slap0);
-		_mediaPlayers[2] = MediaPlayer.create(_context, R.raw.slap1);
-		_mediaPlayers[3] = MediaPlayer.create(_context, R.raw.slap2);
-		_mediaPlayers[4] = MediaPlayer.create(_context, R.raw.impact0);
-		_mediaPlayers[5] = MediaPlayer.create(_context, R.raw.impact1);
-		_mediaPlayers[6] = MediaPlayer.create(_context, R.raw.impact2);
+		mMediaPlayers = new MediaPlayer[7];
+		mMediaPlayers[0] = MediaPlayer.create(cContext, R.raw.wilhelm);
+		mMediaPlayers[1] = MediaPlayer.create(cContext, R.raw.slap0);
+		mMediaPlayers[2] = MediaPlayer.create(cContext, R.raw.slap1);
+		mMediaPlayers[3] = MediaPlayer.create(cContext, R.raw.slap2);
+		mMediaPlayers[4] = MediaPlayer.create(cContext, R.raw.impact0);
+		mMediaPlayers[5] = MediaPlayer.create(cContext, R.raw.impact1);
+		mMediaPlayers[6] = MediaPlayer.create(cContext, R.raw.impact2);
 	}
 	
 	public static void playWilhelm() {
-		if(_mute)
+		if(bMute)
 			return;
-		_instance.playSound(0);
+		aInstance.playSound(0);
 	}
 	public static void playSlap() {
-		if(_mute)
+		if(bMute)
 			return;
 		int n = (int)(Math.random() * 2.99f);
-		_instance.playSound(n + 1);
+		aInstance.playSound(n + 1);
 	}
 	public static void playImpact() {
-		if(_mute)
+		if(bMute)
 			return;
 		int n = (int)(Math.random() * 2.99f);
-		_instance.playSound(n + 4);
+		aInstance.playSound(n + 4);
 	}
 	
 	private void playSound(int n) {
-		if(_mediaPlayers[n].isPlaying()) {
-			_mediaPlayers[n].stop();
+		if(mMediaPlayers[n].isPlaying()) {
+			mMediaPlayers[n].stop();
 			try {
-				_mediaPlayers[n].prepare();
+				mMediaPlayers[n].prepare();
 			} catch (IllegalStateException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -63,6 +63,6 @@ public class AudioManager {
 				e.printStackTrace();
 			}
 		}
-		_mediaPlayers[n].start();
+		mMediaPlayers[n].start();
 	}
 }

@@ -5,6 +5,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.ActionBarActivity;
+import android.util.Log;
 import android.view.View;
 
 public class Home extends ActionBarActivity {
@@ -15,6 +16,7 @@ public class Home extends ActionBarActivity {
 
         PreferenceManager.setDefaultValues(this, R.xml.preferences, false);
         setContentView(R.layout.layout_menu);
+        HighScoresManager.Init(this.getFilesDir());
     }
     
     public void openSettings(View view) {
@@ -29,6 +31,11 @@ public class Home extends ActionBarActivity {
     
     public void playGame(View view) {
     	Intent intent = new Intent(this, Game.class);
+    	startActivity(intent);
+    }
+    
+    public void showScores(View view) {
+    	Intent intent = new Intent(this, ScoresActivity.class);
     	startActivity(intent);
     }
 }
