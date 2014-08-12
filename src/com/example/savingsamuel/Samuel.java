@@ -7,12 +7,21 @@ import android.opengl.Matrix;
 public class Samuel {
 	private static Samuel sInstance;
 
-	private static float
-		fHeight,
-		fWidth,
-		fLeft,
+	private static final float
+		fHeight = 4f,
+		fWidth = (148f / 256f) * 4f,
+		fLeft = -0.5f * fWidth,
 		fBottom = Wall.Top();
-    private static float fVertices[];
+    private static final float fVertices[] = new float[] {
+    	    fLeft,  fHeight, 0.0f,	// top left
+    		0f, 0f,
+    	    fLeft, 0f, 0.0f,	// bottom left
+    	    0f, 1f,
+    	    fLeft + fWidth, 0f, 0.0f, 	// bottom right
+    	    1f, 1f,
+    	 	fLeft + fWidth, fHeight, 0.0f,	// top right
+    	 	1f, 0f
+    	 	};
 
     private static final short sDrawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
     
@@ -27,25 +36,8 @@ public class Samuel {
     public static float Height() { return fHeight; }
     public static float Bottom() { return fBottom; }
     public static void Load() {
-    	Texture texture = Texture.loadTexture("samuel");
-    	
-    	float scale = 4;
-        fHeight = scale;
-		fWidth = ((float)texture.Width() / (float)texture.Height()) * scale;
-		fLeft = -0.5f * fWidth;
-        fVertices = new float[] {
-        	    fLeft,  fHeight, 0.0f,	// top left
-        		0f, 0f,
-        	    fLeft, 0f, 0.0f,	// bottom left
-        	    0f, 1f,
-        	    fLeft + fWidth, 0f, 0.0f, 	// bottom right
-        	    1f, 1f,
-        	 	fLeft + fWidth, fHeight, 0.0f,	// top right
-        	 	1f, 0f
-        	 	};
-        
+    	Texture texture = Texture.loadTexture("samuel");        
         mMesh = new TexturedMesh(fVertices, sDrawOrder, texture);
-
     }
     public static void Draw() {
         sInstance.draw();

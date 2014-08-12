@@ -67,7 +67,7 @@ public class ScoresActivity extends ActionBarActivity implements
 	public boolean onCreateOptionsMenu(Menu menu) {
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.scores, menu);
-		return true;
+		return false;
 	}
 
 	@Override
@@ -96,27 +96,17 @@ public class ScoresActivity extends ActionBarActivity implements
 	@Override
 	public void onResume() {
 		super.onResume();
-		Log.e("ScoresActivity", "onResume");
-		if(getIntent().getAction() == null)
+		String action = getIntent().getAction();
+		if(action == null)
 			return;
-		Log.e("ScoresActivityIntent", getIntent().getAction());
-		if(getIntent().getAction().equals("OPEN_SCORE_0")) {
-			getSupportFragmentManager()
-					.beginTransaction()
-					.replace(R.id.container,
-							PlaceholderFragment.newInstance(1)).commit();
+		if(action.equals("OPEN_SCORE_0")) {
+			getSupportActionBar().setSelectedNavigationItem(0);
 		} else
-		if(getIntent().getAction().equals("OPEN_SCORE_1")) {
-			getSupportFragmentManager()
-					.beginTransaction()
-					.replace(R.id.container,
-							PlaceholderFragment.newInstance(2)).commit();
+		if(action.equals("OPEN_SCORE_1")) {
+			getSupportActionBar().setSelectedNavigationItem(1);
 		} else
-		if(getIntent().getAction().equals("OPEN_SCORE_2")) {
-			getSupportFragmentManager()
-					.beginTransaction()
-					.replace(R.id.container,
-							PlaceholderFragment.newInstance(3)).commit();
+		if(action.equals("OPEN_SCORE_2")) {
+			getSupportActionBar().setSelectedNavigationItem(2);
 		}
 	}
 
@@ -152,7 +142,6 @@ public class ScoresActivity extends ActionBarActivity implements
 			View rootView = inflater.inflate(R.layout.fragment_scores,
 					container, false);
 			
-			Log.e("PlaceholderFragment", "SectionNumber " + secNumber);
 			ListView listview = (ListView) rootView.findViewById(R.id.listView1);
 			ArrayList<String> list = new ArrayList<String>();
 			

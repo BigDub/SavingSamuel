@@ -49,6 +49,7 @@ public class Vector3 {
 		return this;
 	}
 	
+	@Override
 	public String toString() {
 		return "{X:" + x + ", Y:" + y + ", Z:" + z + "}";
 	}

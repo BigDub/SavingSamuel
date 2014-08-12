@@ -121,7 +121,7 @@ public class GameStateManager {
 	}
 	private void update() {
         long nuptime = SystemClock.uptimeMillis();
-        float elapsed = ((float) (nuptime - lUptime) / 1000f) * fTimescale;
+        float elapsed = ((nuptime - lUptime) / 1000f) * fTimescale;
         lUptime = nuptime;
         
         Timer.Update(elapsed);
