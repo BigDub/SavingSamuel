@@ -11,7 +11,9 @@ public class Samuel {
 		fHeight = 4f,
 		fWidth = (148f / 256f) * 4f,
 		fLeft = -0.5f * fWidth,
-		fBottom = Wall.Top();
+		fRight = fLeft + fWidth,
+		fBottom = Wall.Top(),
+		fTop = fBottom + fHeight;
     private static final float fVertices[] = new float[] {
     	    fLeft,  fHeight, 0.0f,	// top left
     		0f, 0f,
@@ -35,6 +37,8 @@ public class Samuel {
     public static float Width() { return fWidth; }
     public static float Height() { return fHeight; }
     public static float Bottom() { return fBottom; }
+    public static float Right() { return fHeight; }
+    public static float Top() { return fTop; }
     public static void Load() {
     	Texture texture = Texture.loadTexture("samuel");        
         mMesh = new TexturedMesh(fVertices, sDrawOrder, texture);
@@ -59,11 +63,21 @@ public class Samuel {
     	GameStateManager.SamuelHit();
     }
     public static boolean Hit(Vector3 position, float radius) {
-    	return !sInstance.bFalling &&
-		position.x + radius > fLeft &&
-		position.x - radius < fLeft + fWidth &&
-		position.y + radius > fBottom &&
-		position.y - radius < fBottom + fHeight;
+    	if(sInstance.bFalling)
+    		return false;
+    	Vector3 nearest = new Vector3(position.x, position.y, 0);
+    	if(position.x < fLeft) {
+			nearest.x = fLeft;
+    	} else if(position.x > fRight) {
+    		nearest.x = fRight;
+    	}
+    	if(position.y < fBottom) {
+    		nearest.y = fBottom;
+    	} else if(position.y > fTop) {
+    		nearest.y = fTop;
+    	}
+    	
+    	return Vector3.Subtract(position, nearest).Magnitude() <= radius;
     }
     
     private Vector3 vPosition, vVelocity;
