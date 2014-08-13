@@ -7,7 +7,6 @@ import android.content.Context;
 import android.opengl.GLES20;
 
 public class Shader {
-	private static Context cContext;
 	private static Shader 
 		sUniformColor,
 		sVaryingColor,
@@ -17,8 +16,7 @@ public class Shader {
 		sNumbers;
 
 	
-	public static void Init(Context context) {
-		cContext = context;
+	public static void Load() {
 		sUniformColor = new Shader(
 				R.string.vertexShaderAttributeP,
 				R.string.fragmentShaderUniformC);
@@ -62,8 +60,9 @@ public class Shader {
 	private Map<String, Integer> mHandles;
 	
 	public Shader(int vsc, int fsc) {
-		this.vertexShaderCode = cContext.getString(vsc);
-		this.fragmentShaderCode = cContext.getString(fsc);
+		Context context = GameStateManager.context();
+		this.vertexShaderCode = context.getString(vsc);
+		this.fragmentShaderCode = context.getString(fsc);
 		mHandles = new HashMap<String, Integer>();
 	}
 	

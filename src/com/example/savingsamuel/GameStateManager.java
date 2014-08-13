@@ -5,7 +5,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
 
-public class GameStateManager {	
+public class GameStateManager {
+	private static boolean bInitialized = false;
 	private static final Vector3 vCameraPosition = new Vector3(0, Wall.Top(), Wall.Top() / 2);
 	private static Context cContext;
 	private static final float 
@@ -30,14 +31,24 @@ public class GameStateManager {
 		gInstance.iDifficulty = Integer.parseInt(sharedPref.getString("pref_dif", "1"));
 		gInstance.bWarnEffect = sharedPref.getBoolean("pref_warn", true);
 	}
+	public static Context context() { return cContext; }
 	public static void Init(Context context) {
 		cContext = context;
+		if(bInitialized)
+			return;
+		bInitialized = true;
         Projectile.Init();
-        AudioManager.Init(context);
-		Shader.Init(context);
-		Texture.Init(context);
+        AudioManager.Init();
 		Samuel.Init();
 		gInstance.newGame();
+	}
+	public static void Load() {
+        Shader.Load();
+        Texture.Load();
+        Wall.Load();
+        Samuel.Load();
+        Rock.Load();
+        NumberWriter.Load();
 	}
 	public static boolean WarnEffect() {
 		if(gInstance.iGamestate == GameState.RUNNING)

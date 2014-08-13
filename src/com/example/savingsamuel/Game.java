@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.media.AudioManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 
 public class Game extends Activity {
 	
@@ -12,6 +13,7 @@ public class Game extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
+		Log.e("Game", "onCreate");
         super.onCreate(savedInstanceState);
         
         setVolumeControlStream(AudioManager.STREAM_MUSIC);
@@ -23,6 +25,7 @@ public class Game extends Activity {
     
     @Override
     protected void onResume() {
+		Log.e("Game", "onResume");
     	super.onResume();
     	SharedPreferences sharedPref = PreferenceManager.getDefaultSharedPreferences(this);
     	GameStateManager.updatePreferences(sharedPref);
@@ -31,6 +34,7 @@ public class Game extends Activity {
     
     @Override
     protected void onPause() {
+		Log.e("Game", "onPause");
     	super.onPause();
     	GameStateManager.OnPause();
     }

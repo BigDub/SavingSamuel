@@ -45,10 +45,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         		0f, GameStateManager.CameraPosition().y, 0f, // Target
         		0f, 1f, 0f // Up
         		);
-        Wall.Load();
-        Samuel.Load();
-        Rock.Load();
-        NumberWriter.Load();
+        GameStateManager.Load();
 	}
 	
 	@Override

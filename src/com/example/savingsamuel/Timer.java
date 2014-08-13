@@ -4,6 +4,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Vector;
 
+import android.util.Log;
+
 public class Timer {
 	private static Vector<Timer>
 		vNewTimers = new Vector<Timer>(1),
@@ -37,6 +39,7 @@ public class Timer {
 		}
 	}
 	public static void Drop() {
+		Log.e("Timer", "Drop");
 		vActiveTimers.clear();
 		vExpiredTimers.clear();
 	}
@@ -47,33 +50,11 @@ public class Timer {
 	private boolean bLooping;
 	
 	public Timer(Object caller, float trigger, String methodName) {
-		oCaller = caller;
-		try {
-			mAction = oCaller.getClass().getMethod(methodName, (Class<?>[])null);
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
-		fTrigger = trigger;
-		fTimer = fTrigger;
-		bLooping = false;
-		register(this);
+		this(caller, trigger, methodName, 0, false);
 	}
 	
 	public Timer(Object caller, float trigger, String methodName, float offset) {
-		oCaller = caller;
-		try {
-			mAction = oCaller.getClass().getMethod(methodName, (Class<?>[])null);
-		} catch (NoSuchMethodException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return;
-		}
-		fTrigger = trigger;
-		fTimer = fTrigger + offset;
-		bLooping = false;
-		register(this);
+		this(caller, trigger, methodName, offset, false);
 	}
 	
 	public Timer(Object caller, float trigger, String methodName, float offset, boolean loop) {

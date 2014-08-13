@@ -3,14 +3,12 @@ package com.example.savingsamuel;
 import java.util.HashMap;
 import java.util.Map;
 
-import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.opengl.GLES20;
 import android.opengl.GLUtils;
 
 public class Texture {
-	private static Context cContext;
 	private static Map<String, Texture> mTextureMap;
 	private int iWidth, iHeight, iHandle;
 	
@@ -18,8 +16,7 @@ public class Texture {
 	public int Width() { return iWidth; }
 	public int Height() { return iHeight; }
 	
-	public static void Init(Context context) {
-		cContext = context;
+	public static void Load() {
 		mTextureMap = new HashMap<String, Texture>();
 	}
 
@@ -28,7 +25,7 @@ public class Texture {
 			return mTextureMap.get(filename);
 		}
 		
-		int resourceId = cContext.getResources().getIdentifier(filename, "drawable", "com.example.savingsamuel");
+		int resourceId = GameStateManager.context().getResources().getIdentifier(filename, "drawable", "com.example.savingsamuel");
 		if (resourceId == 0)
 	    {
 	        throw new RuntimeException("Error texture not found: " + filename);
@@ -45,7 +42,7 @@ public class Texture {
 	        options.inScaled = false;   // No pre-scaling
 	 
 	        // Read in the resource
-	        final Bitmap bitmap = BitmapFactory.decodeResource(cContext.getResources(), resourceId, options);
+	        final Bitmap bitmap = BitmapFactory.decodeResource(GameStateManager.context().getResources(), resourceId, options);
 	        newTexture.iWidth = bitmap.getWidth();
 	        newTexture.iHeight = bitmap.getHeight();
 	        // Bind to the texture in OpenGL

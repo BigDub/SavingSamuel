@@ -6,7 +6,6 @@ import android.content.Context;
 import android.media.MediaPlayer;
 
 public class AudioManager {
-	private static Context cContext;
 	private static AudioManager aInstance;
 	private static boolean bMute = false;
 	
@@ -14,14 +13,14 @@ public class AudioManager {
 		bMute = mute;
 	}
 
-	public static void Init(Context context) {
-		cContext = context;
+	public static void Init() {
 		aInstance = new AudioManager();
 	}
 	
 	private MediaPlayer[] mMediaPlayers;
 	
 	public AudioManager() {
+		Context cContext = GameStateManager.context();
 		mMediaPlayers = new MediaPlayer[7];
 		mMediaPlayers[0] = MediaPlayer.create(cContext, R.raw.wilhelm);
 		mMediaPlayers[1] = MediaPlayer.create(cContext, R.raw.slap0);
