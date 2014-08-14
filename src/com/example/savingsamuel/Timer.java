@@ -4,8 +4,6 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Vector;
 
-import android.util.Log;
-
 public class Timer {
 	private static Vector<Timer>
 		vNewTimers = new Vector<Timer>(1),
@@ -39,7 +37,6 @@ public class Timer {
 		}
 	}
 	public static void Drop() {
-		Log.e("Timer", "Drop");
 		vActiveTimers.clear();
 		vExpiredTimers.clear();
 	}
