@@ -29,9 +29,6 @@ public class ColoredMesh extends Mesh {
 
 	@Override
 	public void Draw(float[] mMVPMatrix, Shader mProgram) {
-		//int mProgram = ShaderProgram.VaryingColor();
-        // Add program to OpenGL ES environment
-        GLES20.glUseProgram(mProgram.Program());
 
         // get handle to vertex shader's vPosition member
         int mPositionHandle = mProgram.getVertexAttribute("vPosition");

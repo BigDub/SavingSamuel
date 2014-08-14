@@ -12,14 +12,7 @@ public class MyGLSurfaceView extends GLSurfaceView {
 	
 	@Override
 	public boolean onTouchEvent(MotionEvent e) {
-		float x = e.getX();
-		float y = e.getY();
-		
-		switch(e.getAction()) {
-		case MotionEvent.ACTION_DOWN:
-			Projectile.Knock(x, y);
-			break;
-		}
+		GameStateManager.onTouchEvent(e);
 		return true;
 	}
 

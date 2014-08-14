@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.SystemClock;
+import android.view.MotionEvent;
 
 public class GameStateManager {
 	private static boolean bInitialized = false;
@@ -48,7 +49,7 @@ public class GameStateManager {
         Wall.Load();
         Samuel.Load();
         Rock.Load();
-        NumberWriter.Load();
+        UserInterface.Load();
 	}
 	public static boolean WarnEffect() {
 		if(gInstance.iGamestate == GameState.RUNNING)
@@ -69,7 +70,7 @@ public class GameStateManager {
 			return 6;	
 		}
 	}
-	public static float Score() { return gInstance.iScore; }
+	public static int Score() { return gInstance.iScore; }
 	public static void Update() {
 		if(gInstance.bHasFocus)
 			gInstance.update();
@@ -92,14 +93,21 @@ public class GameStateManager {
 	}
 	public static void OnResume() { gInstance.onResume(); }
 	public static void OnPause() { gInstance.onPause(); }
+	public static void SurfaceChange() {
+		Wall.setAspectRatio();
+		UserInterface.Init();
+	}
+	public static void Pause() { gInstance.pause(); }
+	public static void Unpause() { gInstance.unpause(); }
+	public static void onTouchEvent(MotionEvent e) { gInstance.TouchEvent(e); }
 	
 	private long lUptime;
-	private int iGamestate, iDifficulty, iScore;
+	private int iGamestate, iPrePauseGamestate, iDifficulty, iScore;
 	// Lower numbers means harder difficulty
 	private boolean bWarnEffect, bHasFocus;
 	private FloatDistribution fRockFlightTime, fRockDelayTime, fDistractionDelayTime;
 	private Vector3Distribution vCrowdArea;
-	private float fCrowdOffset = 12, fTimescale = 1;
+	private float fCrowdOffset = 12;
 	
 	public GameStateManager() {}
 	
@@ -130,10 +138,16 @@ public class GameStateManager {
 	}
 	private void update() {
         long nuptime = SystemClock.uptimeMillis();
-        float elapsed = ((nuptime - lUptime) / 1000f) * fTimescale;
+        float elapsed = ((nuptime - lUptime) / 1000f);
         lUptime = nuptime;
         
-        Timer.Update(elapsed);
+        UserInterface.Update(elapsed);
+        Timescale.Update(elapsed);
+        
+        elapsed *= Timescale.value();
+        
+        if(iGamestate != GameState.PAUSED)
+        	Timer.Update(elapsed);
         
 		if(iGamestate == GameState.RUNNING) {
 	        Projectile.Update(elapsed);
@@ -145,8 +159,8 @@ public class GameStateManager {
 	private void newGame() {
 		Samuel.Reset();
 		Projectile.Reset();
+		Timescale.Reset();
 		iScore = 0;
-		fTimescale = 1;
 		fRockFlightTime = new FloatDistribution(3f, 0.1f);
 		fRockDelayTime = new FloatDistribution(fRockDelayMeanInitial, fRockDelayDeviationInitial);
 		fDistractionDelayTime = new FloatDistribution(3, 0.5f);
@@ -205,5 +219,38 @@ public class GameStateManager {
 	}
 	private void onPause() {
 		bHasFocus = false;
+		if(pause())
+			UserInterface.onPause();
+	}
+	private boolean pause() {
+		if(iGamestate != GameState.PAUSED &&
+				iGamestate != GameState.GAMEOVER) {
+			iPrePauseGamestate = iGamestate;
+			iGamestate = GameState.PAUSED;
+			Timescale.Pause();
+			return true;
+		}
+		return false;
+	}
+	private void unpause() {
+		if(iGamestate == GameState.PAUSED) {
+			iGamestate = iPrePauseGamestate;
+			Timescale.Unpause();
+		}
+	}
+	private void TouchEvent(MotionEvent e) {
+		float x = e.getX();
+		float y = e.getY();
+		
+		switch(e.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			if(iGamestate == GameState.RUNNING ||
+					iGamestate == GameState.PAUSED ||
+					iGamestate == GameState.LOSING) {
+				Projectile.Knock(x, y);
+			}
+			UserInterface.onTouch(x, y);
+			break;
+		}
 	}
 }

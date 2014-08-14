@@ -71,11 +71,14 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         GLES20.glDisable(GLES20.GL_DEPTH_TEST);
         Projectile.DrawShadow();
         GLES20.glDisable(GLES20.GL_STENCIL_TEST);
-        NumberWriter.DrawNumber(Math.round(GameStateManager.Score()));
         GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         
         
         Projectile.DrawPost();
+
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
+        UserInterface.Draw();
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
 	}
 
 	@Override
@@ -89,6 +92,7 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         Matrix.orthoM(mOrthoMatrix, 0, 0, width, 0, height, -1, 1);
         Matrix.frustumM(mProjectionMatrix, 0, -aspectRatio, aspectRatio, -1, 1, 1, 50);
         Matrix.multiplyMM(mVPMatrix, 0, mProjectionMatrix, 0, mViewMatrix, 0);
-        Wall.setAspectRatio(aspectRatio);
+        
+        GameStateManager.SurfaceChange();
 	}
 }

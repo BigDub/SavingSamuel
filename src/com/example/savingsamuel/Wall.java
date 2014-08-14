@@ -1,5 +1,6 @@
 package com.example.savingsamuel;
 
+import android.opengl.GLES20;
 import android.opengl.Matrix;
 
 
@@ -22,7 +23,8 @@ public class Wall {
     
     private static Mesh mMesh;
     
-    public static void setAspectRatio(float aspectRatio) {
+    public static void setAspectRatio() {
+    	float aspectRatio = (float) MyRenderer.Width() / MyRenderer.Height();
     	fWidth = 2 * aspectRatio * GameStateManager.CameraPosition().z;
     	float[] mModel = new float[16];
     	Matrix.setIdentityM(mModel, 0);
@@ -39,6 +41,7 @@ public class Wall {
     }
     
     public static void Draw() {
+    	GLES20.glUseProgram(Shader.VaryingColor().Program());
         mMesh.Draw(mMVPMatrix, Shader.VaryingColor());
     }
 }
