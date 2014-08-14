@@ -57,12 +57,15 @@ public class MyRenderer implements GLSurfaceView.Renderer {
         
         Projectile.DrawPre();
         
+        Samuel.Draw();
+        
+        Projectile.DrawMid();
+        
         GLES20.glEnable(GLES20.GL_STENCIL_TEST);
         GLES20.glStencilFunc(GLES20.GL_ALWAYS, 1, 0xFF);
         GLES20.glStencilMask(0xFF);
         GLES20.glClear(GLES20.GL_STENCIL_BUFFER_BIT);
-        
-        Samuel.Draw();
+
         Wall.Draw();
         
         GLES20.glStencilFunc(GLES20.GL_EQUAL, 1, 0xFF);

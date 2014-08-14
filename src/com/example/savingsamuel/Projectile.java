@@ -13,11 +13,12 @@ public abstract class Projectile {
 	private static float fKnockX, fKnockY;
 	private static Vector3 vWarningTint = new Vector3(1, 0.5f, 0.5f);
 	
-	protected static Vector<Projectile> vProjectiles, vPreList, vPostList;
+	protected static Vector<Projectile> vProjectiles, vPreList, vMidList, vPostList;
 	
 	public static void Init() {
 		vProjectiles = new Vector<Projectile>();
 		vPreList = new Vector<Projectile>();
+		vMidList = new Vector<Projectile>();
 		vPostList = new Vector<Projectile>();
 	}
 	public static void Update(float elapsed) {
@@ -65,12 +66,24 @@ public abstract class Projectile {
 	}	
 	public static void DrawPre() {
     	Vector<Projectile> removeList = new Vector<Projectile>(1);
+		float z = Samuel.Position().z;
+		boolean mid = (z != 0);
     	for(Projectile p : vProjectiles) {
     		if(p.bActive) {
-    			if(p.vPosition.z < 0) {
-    				vPreList.add(p);
+    			if(!mid) {
+	    			if(p.vPosition.z < 0) {
+	    				vPreList.add(p);
+	    			} else {
+	    				vPostList.add(p);
+	    			}
     			} else {
-    				vPostList.add(p);
+    				if(p.vPosition.z < z) {
+    					vPreList.add(p);
+    				} else if(p.vPosition.z < 0) {
+    					vMidList.add(p);
+    				} else {
+    					vPostList.add(p);
+    				}
     			}
     		} else {
     			removeList.add(p);
@@ -79,6 +92,7 @@ public abstract class Projectile {
     	for(Projectile p : removeList)
     		vProjectiles.remove(p);
     	Collections.sort(vPreList, ProjectileComparator.Instance());
+    	Collections.sort(vMidList, ProjectileComparator.Instance());
     	Collections.sort(vPostList, ProjectileComparator.Instance());
     	
     	if(GameStateManager.WarnEffect()) {
@@ -92,6 +106,11 @@ public abstract class Projectile {
     		p.draw();
     	}
     }
+	public static void DrawMid() {
+    	for(Projectile p : vMidList) {
+    		p.draw();
+    	}
+	}
     public static void DrawShadow() {
     	for(Projectile p : vPostList) {
     		p.drawShadow();
@@ -102,6 +121,7 @@ public abstract class Projectile {
     		p.draw();
     	}
     	vPreList.clear();
+    	vMidList.clear();
     	vPostList.clear();
     }
     public static void Reset() {
