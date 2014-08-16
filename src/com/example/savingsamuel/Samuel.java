@@ -126,36 +126,16 @@ public class Samuel {
         
         GLES20.glUseProgram(Shader.Textured().Program());
     	mMesh.Draw(mMVPMatrix, Shader.Textured());
-    	
-    	GLES20.glUseProgram(Shader.UniformColor().Program());
-    	int mColorHandle = Shader.UniformColor().getUniform("uColor");
-    	GLES20.glUniform4f(mColorHandle, 1, 0, 0, 0.5f);
-    	for(CollisionBox cb : collisionBoxes) {
-    		cb.Draw(mMVPMatrix);
-    	}
     }
     
-    private static class CollisionBox {        
-    	private Mesh mMesh;
+    private static class CollisionBox {
     	private final float fLeft, fRight, fTop, fBottom;
-    	private final float[] fVertices;
     	
     	public CollisionBox(Vector3 center, float width, float height) {
     		fLeft = center.x - width / 2;
     		fRight = center.x + width / 2;
     		fTop = center.y + height / 2;
     		fBottom = center.y - height / 2;
-    		fVertices = new float[] {
-    			fLeft, fTop, center.z,
-    			fLeft, fBottom, center.z,
-    			fRight, fBottom, center.z,
-    			fRight, fTop, center.z
-    		};
-    		mMesh = new UniformColorMesh(fVertices, sDrawOrder);
-    	}
-    	
-    	public void Draw(float[] matrix) {
-    		mMesh.Draw(matrix, Shader.UniformColor());
     	}
     	
     	public boolean Hit(Vector3 position, float radius) {
