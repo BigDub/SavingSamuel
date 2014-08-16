@@ -29,6 +29,7 @@ public class FloatDistribution {
 	 * @return
 	 */
 	public float GetValue(float percentile) {
+		//TODO: Make this actually follow the principles of statistics.
 		return (percentile * 6 - 3) * fStdDeviation + fMean;
 	}
 	public double GetPercentile(float value) {

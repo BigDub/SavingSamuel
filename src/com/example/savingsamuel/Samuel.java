@@ -28,6 +28,14 @@ public class Samuel {
     private static final short sDrawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
     
     private static Mesh mMesh;
+    private static final CollisionBox[] collisionBoxes = new CollisionBox[] {
+    	new CollisionBox(new Vector3(0, 3.6f, 0), 0.5f, 0.5f),
+    	new CollisionBox(new Vector3(0.1f, 2.4f, 0), 0.75f, 1.75f),
+    	new CollisionBox(new Vector3(-0.35f, 0.75f, 0), 0.35f, 1.5f),
+    	new CollisionBox(new Vector3(0.35f, 0.75f, 0), 0.35f, 1.5f),
+    	new CollisionBox(new Vector3(-0.4f, 2.6f, 0), 0.3f, 0.70f),
+    	new CollisionBox(new Vector3(0.6f, 3f, 0), 0.4f, 0.4f)
+    };
 
 	public static void Init() {
 		sInstance = new Samuel();
@@ -62,7 +70,7 @@ public class Samuel {
     	sInstance.vVelocity.y = 0;
     	GameStateManager.SamuelHit();
     }
-    public static boolean Hit(Vector3 position, float radius) {
+    public static boolean Warn(Vector3 position, float radius) {
     	if(sInstance.bFalling)
     		return false;
     	Vector3 nearest = new Vector3(position.x, position.y, 0);
@@ -76,8 +84,17 @@ public class Samuel {
     	} else if(position.y > fTop) {
     		nearest.y = fTop;
     	}
-    	
     	return Vector3.Subtract(position, nearest).Magnitude() <= radius;
+    }
+    public static boolean Hit(Vector3 position, float radius) {    	
+    	if(Warn(position, radius)) {
+    		Vector3 localspace = Vector3.Subtract(position, sInstance.vPosition);
+    		for(CollisionBox cb : collisionBoxes) {
+    			if(cb.Hit(localspace, radius))
+    				return true;
+    		}
+    	}
+    	return false;
     }
     
     private Vector3 vPosition, vVelocity;
@@ -109,5 +126,51 @@ public class Samuel {
         
         GLES20.glUseProgram(Shader.Textured().Program());
     	mMesh.Draw(mMVPMatrix, Shader.Textured());
+    	
+    	GLES20.glUseProgram(Shader.UniformColor().Program());
+    	int mColorHandle = Shader.UniformColor().getUniform("uColor");
+    	GLES20.glUniform4f(mColorHandle, 1, 0, 0, 0.5f);
+    	for(CollisionBox cb : collisionBoxes) {
+    		cb.Draw(mMVPMatrix);
+    	}
+    }
+    
+    private static class CollisionBox {        
+    	private Mesh mMesh;
+    	private final float fLeft, fRight, fTop, fBottom;
+    	private final float[] fVertices;
+    	
+    	public CollisionBox(Vector3 center, float width, float height) {
+    		fLeft = center.x - width / 2;
+    		fRight = center.x + width / 2;
+    		fTop = center.y + height / 2;
+    		fBottom = center.y - height / 2;
+    		fVertices = new float[] {
+    			fLeft, fTop, center.z,
+    			fLeft, fBottom, center.z,
+    			fRight, fBottom, center.z,
+    			fRight, fTop, center.z
+    		};
+    		mMesh = new UniformColorMesh(fVertices, sDrawOrder);
+    	}
+    	
+    	public void Draw(float[] matrix) {
+    		mMesh.Draw(matrix, Shader.UniformColor());
+    	}
+    	
+    	public boolean Hit(Vector3 position, float radius) {
+    		Vector3 nearest = new Vector3(position.x, position.y, 0);
+        	if(position.x < fLeft) {
+    			nearest.x = fLeft;
+        	} else if(position.x > fRight) {
+        		nearest.x = fRight;
+        	}
+        	if(position.y < fBottom) {
+        		nearest.y = fBottom;
+        	} else if(position.y > fTop) {
+        		nearest.y = fTop;
+        	}
+    		return Vector3.Subtract(position, nearest).Magnitude() <= radius;
+    	}
     }
 }

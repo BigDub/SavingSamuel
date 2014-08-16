@@ -9,9 +9,9 @@
     </string>
     <string name="fragmentShaderUniformC">
         precision mediump float;
-	    uniform vec4 _uColor;
+	    uniform vec4 uColor;
 	    void main() {
-	      gl_FragColor = _uColor;
+	      gl_FragColor = uColor;
 	    }
     </string>
    	<string name="vertexShaderAttributePC">

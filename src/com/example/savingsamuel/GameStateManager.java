@@ -195,8 +195,8 @@ public class GameStateManager {
 	}
 	private void newRock() {
 		launchRock(new Vector3(
-				Samuel.Left() + (float)(Math.random() * 0.5 + 0.5) * Samuel.Width(),
-				Samuel.Bottom() + (float)(Math.random() * 0.5 + 0.5) * Samuel.Height(),
+				Samuel.Left() + (float)(Math.random() * 0.5 + 0.25) * Samuel.Width(),
+				Samuel.Bottom() + (float)(Math.random() * 0.5 + 0.25) * Samuel.Height(),
 				0),
 				true
 		);   

@@ -7,13 +7,13 @@ import java.nio.ShortBuffer;
 
 import android.opengl.GLES20;
 
-public class ColoredMesh extends Mesh {
-	private static int BYTES_PER_VERTEX = 4 * (3 + 4);
+public class UniformColorMesh extends Mesh {
+	private static int BYTES_PER_VERTEX = 4 * 3;
 
 	protected final FloatBuffer fbVertexBuffer;
 	protected final ShortBuffer sbIndexBuffer;
 	
-	public ColoredMesh(float[] vertices, short[] indices) {
+	public UniformColorMesh(float[] vertices, short[] indices) {
 		ByteBuffer vb = ByteBuffer.allocateDirect(4 * vertices.length);
 		vb.order(ByteOrder.nativeOrder());
 		fbVertexBuffer = vb.asFloatBuffer();
@@ -24,6 +24,12 @@ public class ColoredMesh extends Mesh {
 		sbIndexBuffer = ib.asShortBuffer();
 		sbIndexBuffer.put(indices);
 		sbIndexBuffer.position(0);
+	}
+	
+	public static void SetColor(Shader mProgram, float red, float green, float blue, float alpha) {
+		int mColorHandle = mProgram.getUniform("uColor");
+		
+		GLES20.glUniform4f(mColorHandle, red, green, blue, alpha);
 	}
 
 	@Override
@@ -41,16 +47,6 @@ public class ColoredMesh extends Mesh {
                                      GLES20.GL_FLOAT, false,
                                      BYTES_PER_VERTEX, fbVertexBuffer);
 
-        // get handle to fragment shader's vColor member
-        int mUVHandle = mProgram.getVertexAttribute("vColor");
-
-        GLES20.glEnableVertexAttribArray(mUVHandle);
-
-		fbVertexBuffer.position(3);
-        GLES20.glVertexAttribPointer(mUVHandle, 4,
-        		GLES20.GL_FLOAT, false,
-        		BYTES_PER_VERTEX, fbVertexBuffer);
-
         // get handle to shape's transformation matrix
         int mMVPMatrixHandle = mProgram.getUniform("uMVPMatrix");
 
@@ -65,6 +61,5 @@ public class ColoredMesh extends Mesh {
 
         // Disable vertex array
         GLES20.glDisableVertexAttribArray(mPositionHandle);
-        GLES20.glDisableVertexAttribArray(mUVHandle);
 	}
 }

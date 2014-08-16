@@ -212,12 +212,7 @@ public abstract class Projectile {
     			projectedX = vPosition.x + vVelocity.x * flightTime,
     			projectedY = vPosition.y + vVelocity.y * flightTime + (-9.8f / 2f) * flightTime * flightTime;
     	
-    	return (
-    			projectedX + colRad >= Samuel.Left() &&
-    			projectedX - colRad <= Samuel.Left() + Samuel.Width() &&
-    			projectedY + colRad >= Samuel.Bottom() &&
-    			projectedY - colRad <= Samuel.Bottom() + Samuel.Height()
-    			);
+    	return Samuel.Warn(new Vector3(projectedX, projectedY, 0), colRad);
     }
     private Vector3 getTint() {
     	if(!bWarnOn)
