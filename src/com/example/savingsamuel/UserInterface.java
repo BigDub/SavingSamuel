@@ -2,6 +2,7 @@ package com.example.savingsamuel;
 
 import android.opengl.GLES20;
 import android.opengl.Matrix;
+import android.view.MotionEvent;
 
 public class UserInterface {
 	private static final float fCharWidth = 32f, fCharHeight = 49f, fButtonLength = 128f, fButton2 = fButtonLength / 2;
@@ -35,7 +36,7 @@ public class UserInterface {
 		1, 1, 0,
 		0, 0, 0, 0.5f
 	};
-	private static float fMidX, fMidY, fWidth, fHeight;
+	private static float fMidX, fMidY, fWidth, fHeight, fDragDistance;
     private static short sDrawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
     private static boolean bPaused = false, bUnpausing = false;
     private static float fPauseTime = 0;
@@ -75,6 +76,7 @@ public class UserInterface {
     	fHeight = MyRenderer.Height();
     	fMidX = fWidth / 2;
     	fMidY = fHeight / 2;
+    	fDragDistance = (float) (Math.hypot(fWidth, fHeight) * 0.25f);
     }
     public static void onPause() {
     	bPaused = true;
@@ -108,6 +110,21 @@ public class UserInterface {
     			bUnpausing = true;
     		}
     	}
+    }
+    
+    public static void TouchEvent(MotionEvent e) {
+    	float x = e.getX();
+		float y = e.getY();
+		
+		switch(e.getAction()) {
+		case MotionEvent.ACTION_DOWN:
+			onTouch(x, y);
+			break;
+		case MotionEvent.ACTION_MOVE:
+			break;
+		case MotionEvent.ACTION_UP:
+			break;
+		}
     }
     public static void Draw() {
     	DrawNumber(GameStateManager.Score(), 0f, fHeight - fCharHeight, 1f);

@@ -1,0 +1,27 @@
+<resources>
+    <string name="app_name">Salvando Samuel</string>
+    <string name="play_button">Jugar</string>
+    <string name="settings">Ajustes</string>
+    <string name="action_settings">Ajustes</string>
+    
+    <string name="pref_mute_title">Silenciar</string>
+    <string name="pref_mute_summary">Desactivar los sonidos del juego.</string>
+    
+    <string name="pref_warn_title">Efecto de advertencia</string>
+    <string name="pref_warn_summary">Hace que los proyectiles dirigidos a Samuel destellan rojo.</string>
+    
+    <string name="pref_dif_title">Dificultad de tocar</string>
+    <string name="pref_dif_dialog">Dificultad de tocar</string>
+    <string name="pref_dif_summary">Define la facilidad de tocar un proyectil.</string>
+    <string-array name="pref_dif_labels">
+	    <item>Preciso</item>
+	    <item>Difícil</item>
+	    <item>Fácil</item>
+	</string-array>
+	
+    <string name="scores">Puntuaciones más altas</string>
+    <string name="title_activity_scores">Puntuaciónes más altas</string>
+    <string name="score_section0">Puntuaciónes más altas: preciso</string>
+    <string name="score_section1">Puntuaciónes más altas: difícil</string>
+    <string name="score_section2">Puntuaciónes más altas: fácil</string>
+</resources>

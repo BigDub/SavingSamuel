@@ -249,7 +249,7 @@ public class GameStateManager {
 					iGamestate == GameState.LOSING) {
 				Projectile.Knock(x, y);
 			}
-			UserInterface.onTouch(x, y);
+			UserInterface.TouchEvent(e);
 			break;
 		}
 	}
