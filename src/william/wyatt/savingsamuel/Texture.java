@@ -25,7 +25,7 @@ public class Texture {
 			return mTextureMap.get(filename);
 		}
 		
-		int resourceId = GameStateManager.context().getResources().getIdentifier(filename, "drawable", "com.example.savingsamuel");
+		int resourceId = GameStateManager.context().getResources().getIdentifier(filename, "drawable", "william.wyatt.savingsamuel");
 		if (resourceId == 0)
 	    {
 	        throw new RuntimeException("Error texture not found: " + filename);

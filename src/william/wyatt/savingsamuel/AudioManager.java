@@ -2,7 +2,7 @@ package william.wyatt.savingsamuel;
 
 import java.io.IOException;
 
-import com.example.savingsamuel.R;
+import william.wyatt.savingsamuel.R;
 
 import android.content.Context;
 import android.media.MediaPlayer;

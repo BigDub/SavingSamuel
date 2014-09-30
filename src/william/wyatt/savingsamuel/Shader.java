@@ -3,7 +3,7 @@ package william.wyatt.savingsamuel;
 import java.util.HashMap;
 import java.util.Map;
 
-import com.example.savingsamuel.R;
+import william.wyatt.savingsamuel.R;
 
 import android.content.Context;
 import android.opengl.GLES20;

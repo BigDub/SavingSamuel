@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="com.example.savingsamuel"
+    package="william.wyatt.savingsamuel"
     android:versionCode="1"
     android:versionName="1.0" >
     
@@ -40,7 +40,7 @@
             android:parentActivityName="william.wyatt.savingsamuel.Home" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.savingsamuel.Home" />
+                android:value="william.wyatt.savingsamuel.Home" />
         </activity>
         <activity
             android:name="william.wyatt.savingsamuel.SettingsActivityHC"
@@ -48,7 +48,7 @@
             android:parentActivityName="william.wyatt.savingsamuel.Home" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.savingsamuel.Home" />
+                android:value="william.wyatt.savingsamuel.Home" />
         </activity>
         <activity
             android:name="william.wyatt.savingsamuel.Game"
@@ -59,7 +59,7 @@
             android:theme="@android:style/Theme.NoTitleBar.Fullscreen" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.savingsamuel.Home" />
+                android:value="william.wyatt.savingsamuel.Home" />
         </activity>
         <activity
             android:name="william.wyatt.savingsamuel.ScoresActivity"
@@ -67,7 +67,7 @@
             android:parentActivityName="william.wyatt.savingsamuel.Home" >
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.example.savingsamuel.Home" />
+                android:value="william.wyatt.savingsamuel.Home" />
         </activity>
         <!--Include the AdActivity configChanges and theme. -->
         <activity android:name="com.google.android.gms.ads.AdActivity"

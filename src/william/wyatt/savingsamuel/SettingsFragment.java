@@ -1,6 +1,6 @@
 package william.wyatt.savingsamuel;
 
-import com.example.savingsamuel.R;
+import william.wyatt.savingsamuel.R;
 
 import android.os.Bundle;
 import android.preference.PreferenceFragment;
