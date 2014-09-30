@@ -8,7 +8,7 @@
 
     <fragment
         android:id="@+id/mainFragment"
-        android:name="com.example.savingsamuel.Home$PlaceholderFragment"
+        android:name="william.wyatt.savingsamuel.Home$PlaceholderFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_above="@+id/adFragment"
@@ -16,7 +16,7 @@
 
     <fragment
         android:id="@+id/adFragment"
-        android:name="com.example.savingsamuel.Home$AdFragment"
+        android:name="william.wyatt.savingsamuel.Home$AdFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_alignParentBottom="true"
