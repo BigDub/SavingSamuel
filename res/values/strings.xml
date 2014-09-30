@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">Saving Samuel</string>
+    <string name="ad_unit_id">ca-app-pub-4573705201628976/8546560133</string>
     <string name="play_button">Play</string>
     <string name="settings">Settings</string>
     <string name="pref_mute_title">Mute</string>

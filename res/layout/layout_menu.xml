@@ -1,32 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:layout_marginBottom="@dimen/activity_vertical_margin"
-    android:layout_marginLeft="@dimen/activity_horizontal_margin"
-    android:layout_marginRight="@dimen/activity_horizontal_margin"
-    android:layout_marginTop="@dimen/activity_vertical_margin"
     android:orientation="vertical" >
 
-    <Button
-        android:id="@+id/settings_button"
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.example.savingsamuel.Home$PlaceholderFragment"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_above="@+id/adFragment"
+        tools:layout="@layout/fragment_main" />
+
+    <fragment
+        android:id="@+id/adFragment"
+        android:name="com.example.savingsamuel.Home$AdFragment"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="@string/settings"
-        android:onClick="openSettings" />
+        android:layout_alignParentBottom="true"
+        tools:layout="@layout/fragment_ad" />
 
-    <Button
-        android:id="@+id/score_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/scores"
-        android:onClick="showScores" />
-
-    <Button
-        android:id="@+id/play_button"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:text="@string/play_button"
-        android:onClick="playGame" />
-
-</LinearLayout>
+</RelativeLayout>
