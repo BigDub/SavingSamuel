@@ -89,7 +89,7 @@ public class ScoresActivity extends ActionBarActivity implements
 		// container view.
 		getSupportFragmentManager()
 				.beginTransaction()
-				.replace(R.id.container,
+				.replace(R.id.replaceFrame,
 						PlaceholderFragment.newInstance(position + 1)).commit();
 		return true;
 	}
