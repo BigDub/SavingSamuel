@@ -185,6 +185,8 @@ public class GameStateManager {
 		if(iGamestate == GameState.RUNNING) {
 			iGamestate = GameState.LOSING;
 			Timer.Drop();
+			Timescale.Pause();
+			Timescale.Unpause();
 			HighScoresManager.addScore(iDifficulty, iScore);
 			new Timer(this, fLossWait, "GoToScores");
 		}

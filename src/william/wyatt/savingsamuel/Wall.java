@@ -1,35 +1,43 @@
 package william.wyatt.savingsamuel;
 
 import android.opengl.GLES20;
-import android.opengl.Matrix;
 
 
 public class Wall {
 	private static final float TOP = 20f;
-	private static float fWidth = 1;
-	private static float[] mMVPMatrix = new float[16];
-    private static final float fVertices[] = {
-	    -0.5f,  TOP, 0.0f,	// top left
-		0.757f, 0.792f, 0.769f, 1.0f,
-	    -0.5f, 0f, 0.0f,	// bottom left
-	    0.310f, 0.443f, 0.376f, 1.0f,
-	    0.5f, 0f, 0.0f, 	// bottom right
-	    0.310f, 0.443f, 0.376f, 1.0f,
-	 	0.5f,  TOP, 0.0f,	// top right
-	 	0.757f, 0.792f, 0.769f, 1.0f
-	 	};
+    private static float fVertices[];
 
     private static final short sDrawOrder[] = { 0, 1, 2, 0, 2, 3 }; // order to draw vertices
     
     private static Mesh mMesh;
     
     public static void setAspectRatio() {
-    	float aspectRatio = (float) MyRenderer.Width() / MyRenderer.Height();
-    	fWidth = 2 * aspectRatio * GameStateManager.CameraPosition().z;
-    	float[] mModel = new float[16];
-    	Matrix.setIdentityM(mModel, 0);
-    	Matrix.scaleM(mModel, 0, fWidth, 1, 1);
-    	Matrix.multiplyMM(mMVPMatrix, 0, MyRenderer.mVPMatrix(), 0, mModel, 0);
+    	Texture texture = Texture.loadTexture("wall"); 
+    	float tWidth = texture.Width();
+    	float tHeight = texture.Height();
+    	float tAspectRatio = tWidth / tHeight;
+    	float bgAspectRatio = (float) MyRenderer.Width() / ((float) MyRenderer.Height() / 2);
+    	float uvHeight, uvWidth;
+    	if (bgAspectRatio > tAspectRatio) {
+    		uvWidth = 0.5f;
+    		uvHeight = (tWidth / bgAspectRatio) / tHeight;
+    	} else {
+    		uvHeight = 1;
+    		uvWidth = ((tHeight * bgAspectRatio) / tWidth) / 2;
+    	}
+    	float fWidth = bgAspectRatio * GameStateManager.CameraPosition().z * 0.5f;
+
+    	fVertices = new float[] {
+		    -fWidth,  TOP, 0.0f,	// top left
+		    0.5f - uvWidth, 1f - uvHeight,
+		    -fWidth, 10, 0.0f,	// bottom left
+		    0.5f - uvWidth, 1f,
+		    fWidth, 10, 0.0f, 	// bottom right
+		    0.5f + uvWidth, 1f,
+		 	fWidth,  TOP, 0.0f,	// top right
+		 	0.5f + uvWidth, 1f - uvHeight
+	 	};
+        mMesh = new TexturedMesh(fVertices, sDrawOrder, texture);
     }
     
     public static float Top() {
@@ -37,11 +45,14 @@ public class Wall {
     }
 
     public static void Load() {
-        mMesh = new ColoredMesh(fVertices, sDrawOrder);
+    	if (fVertices != null) {
+	    	Texture texture = Texture.loadTexture("wall"); 
+	        mMesh = new TexturedMesh(fVertices, sDrawOrder, texture);
+    	}
     }
     
     public static void Draw() {
-    	GLES20.glUseProgram(Shader.VaryingColor().Program());
-        mMesh.Draw(mMVPMatrix, Shader.VaryingColor());
+    	GLES20.glUseProgram(Shader.Textured().Program());
+        mMesh.Draw(MyRenderer.mVPMatrix(), Shader.Textured());
     }
 }
