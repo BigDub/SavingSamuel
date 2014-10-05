@@ -2,8 +2,8 @@ package william.wyatt.savingsamuel;
 
 
 public class Rock extends Projectile{
-	private static Vector3Distribution vTints = new Vector3Distribution(0.97f, 0.04f, 0.97f, 0.02f, 0.97f, 0.02f);
-	private static FloatDistribution fShades = new FloatDistribution(0.3f, 0.1f);
+	private static Vector3Range vTints = new Vector3Range(0.97f, 0.12f, 0.97f, 0.06f, 0.97f, 0.06f);
+	private static FloatRange fShades = new FloatRange(0.3f, 0.3f);
 	private short sVariation;
 	private static float fVertices[] = {
 	    -0.5f,  0.5f, 0.0f,	// top left
@@ -32,7 +32,7 @@ public class Rock extends Projectile{
 	private Rock() {
 		super();
 		sVariation = (short)(Math.random() * 2f);
-		vTint = vTints.GetRandom();
+		vTint = vTints.getRandom();
 		if(vTint.x > 1)
 			vTint.x = 1;
 		if(vTint.y > 1)
@@ -43,7 +43,7 @@ public class Rock extends Projectile{
 			vTint.y = vTint.x;
 		if(vTint.x > vTint.z)
 			vTint.z = vTint.x;
-		float shade = fShades.GetRandom();
+		float shade = fShades.getRandom();
 		if(shade > 0) {
 			vTint.x -= shade;
 			vTint.y -= shade;

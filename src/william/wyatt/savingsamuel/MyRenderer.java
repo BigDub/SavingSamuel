@@ -54,6 +54,10 @@ public class MyRenderer implements GLSurfaceView.Renderer {
 		
         GLES20.glClear(GLES20.GL_COLOR_BUFFER_BIT);
         GLES20.glClear(GLES20.GL_DEPTH_BUFFER_BIT);
+
+        GLES20.glDisable(GLES20.GL_DEPTH_TEST);
+        Background.Draw();
+        GLES20.glEnable(GLES20.GL_DEPTH_TEST);
         
         Projectile.DrawPre();
         

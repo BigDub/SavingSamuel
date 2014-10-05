@@ -10,19 +10,20 @@ public class GameStateManager {
 	private static boolean bInitialized = false;
 	private static final Vector3 vCameraPosition = new Vector3(0, Wall.Top(), Wall.Top() / 2);
 	private static Context cContext;
+
+	private static float fRockDelayMeanX = 1.5f;
 	private static final float 
-		fInitialSafeTime = 2,
+		fInitialSafeTime = 1.5f,
 		fLossWait = 5,
 		fDifficultyRampTime = 1,
 		fDifficultyRampLength = 60f / fDifficultyRampTime,
 		
 		fRockDelayMeanInitial = 2,
-		fRockDelayMeanFinal = 0.8f,
-		fRockDelayMeanDecay = (fRockDelayMeanFinal - fRockDelayMeanInitial) / fDifficultyRampLength,
+		fRockDelayMeanFinal = 0.5f,
 		
-		fRockDelayDeviationInitial = 0.25f,
-		fRockDelayDeviationFinal = 0.1f,
-		fRockDelayDeviationDecay = (fRockDelayDeviationFinal - fRockDelayDeviationInitial) / fDifficultyRampLength;
+		fRockDelayRangeInitial = 0.75f,
+		fRockDelayDeviationFinal = 0.3f,
+		fRockDelayDeviationDecay = (fRockDelayDeviationFinal - fRockDelayRangeInitial) / fDifficultyRampLength;
 	private static GameStateManager gInstance = new GameStateManager();
 	
 	public static GameStateManager Instance() { return gInstance; }
@@ -50,6 +51,7 @@ public class GameStateManager {
         Samuel.Load();
         Rock.Load();
         UserInterface.Load();
+        Background.Load();
 	}
 	public static boolean WarnEffect() {
 		if(gInstance.iGamestate == GameState.RUNNING)
@@ -95,6 +97,7 @@ public class GameStateManager {
 	public static void OnPause() { gInstance.onPause(); }
 	public static void SurfaceChange() {
 		Wall.setAspectRatio();
+		Background.setAspectRatio();
 		UserInterface.Init();
 	}
 	public static void Pause() { gInstance.pause(); }
@@ -105,14 +108,14 @@ public class GameStateManager {
 	private int iGamestate, iPrePauseGamestate, iDifficulty, iScore;
 	// Lower numbers means harder difficulty
 	private boolean bWarnEffect, bHasFocus;
-	private FloatDistribution fRockFlightTime, fRockDelayTime, fDistractionDelayTime;
-	private Vector3Distribution vCrowdArea;
+	private FloatRange fRockFlightTime, fRockDelayTime, fDistractionDelayTime;
+	private Vector3Range vCrowdArea;
 	private float fCrowdOffset = 12;
 	
 	public GameStateManager() {}
 	
 	private Vector3 launchOrigin() {
-		Vector3 origin = vCrowdArea.GetRandom();
+		Vector3 origin = vCrowdArea.getRandom();
 		if(Math.random() < 0.5f) {
 			origin.x -= fCrowdOffset;
 		} else {
@@ -123,7 +126,7 @@ public class GameStateManager {
 	private void launchRock(Vector3 target, boolean warn) {
 		Vector3 position = launchOrigin();
 		Vector3 delta = Vector3.Subtract(target, position);
-		float flightTime = fRockFlightTime.GetRandom();
+		float flightTime = fRockFlightTime.getRandom();
     	Rock.Launch(
     			(float)Math.random() * 360f,
     			(float)Math.random() * 720f - 360f,
@@ -161,17 +164,18 @@ public class GameStateManager {
 		Projectile.Reset();
 		Timescale.Reset();
 		iScore = 0;
-		fRockFlightTime = new FloatDistribution(3f, 0.1f);
-		fRockDelayTime = new FloatDistribution(fRockDelayMeanInitial, fRockDelayDeviationInitial);
-		fDistractionDelayTime = new FloatDistribution(3, 0.5f);
-		vCrowdArea = new Vector3Distribution(
-				0, 3,
+		fRockFlightTime = new FloatRange(3f, 0.3f);
+		fRockDelayMeanX = fRockDelayMeanInitial - fRockDelayMeanFinal;
+		fRockDelayTime = new FloatRange(fRockDelayMeanInitial, fRockDelayRangeInitial);
+		fDistractionDelayTime = new FloatRange(3, 1.5f);
+		vCrowdArea = new Vector3Range(
+				0, 6,
 				0, 0,
-				5, 1
+				5, 3
 				);
 		   
-    	new Timer(this, fRockDelayTime.GetRandom(), "NewRock", fInitialSafeTime);
-    	new Timer(this, fDistractionDelayTime.GetRandom(), "NewDistraction", fInitialSafeTime);
+    	new Timer(this, fRockDelayTime.getRandom(), "NewRock", fInitialSafeTime);
+    	new Timer(this, fDistractionDelayTime.getRandom(), "NewDistraction", fInitialSafeTime);
 		new Timer(this, fDifficultyRampTime, "RampDifficulty", fInitialSafeTime, true);
 		
 		lUptime = SystemClock.uptimeMillis();
@@ -186,11 +190,10 @@ public class GameStateManager {
 		}
 	}
 	private void rampDifficulty() {
-		if(fRockDelayTime.Mean() > fRockDelayMeanFinal) {
-    		fRockDelayTime.ShiftMean(fRockDelayMeanDecay);
-    	}
-    	if(fRockDelayTime.StandardDeviation() > fRockDelayDeviationFinal) {
-    		fRockDelayTime.ShiftStandardDeviation(fRockDelayDeviationDecay);
+		fRockDelayMeanX *= 0.975f;
+    	fRockDelayTime.setMean(fRockDelayMeanX + fRockDelayMeanFinal);
+    	if(fRockDelayTime.range() > fRockDelayDeviationFinal) {
+    		fRockDelayTime.shiftRange(fRockDelayDeviationDecay);
     	}
 	}
 	private void newRock() {
@@ -200,7 +203,7 @@ public class GameStateManager {
 				0),
 				true
 		);   
-    	new Timer(this, fRockDelayTime.GetRandom(), "NewRock");
+    	new Timer(this, fRockDelayTime.getRandom(), "NewRock");
 	}
 	private void newDistraction() {
     	launchRock(new Vector3(
@@ -209,7 +212,7 @@ public class GameStateManager {
     					0),
     					false
     			);
-    	new Timer(this, fDistractionDelayTime.GetRandom(), "NewDistraction");
+    	new Timer(this, fDistractionDelayTime.getRandom(), "NewDistraction");
 	}
 	private void onResume() {
 		bHasFocus = true;
